@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button } from "antd";
 import { Form, Input } from "antd";
 
-const FCSetsCardModal = ({ visible, setVisible, action }) => {
+const FCSetsModal = ({ visible, setVisible, action }) => {
   const [loading, setLoading] = useState(false);
 
   const handleOk = () => {
@@ -56,4 +56,4 @@ const FCSetsCardModal = ({ visible, setVisible, action }) => {
   );
 };
 
-export default FCSetsCardModal;
+export default FCSetsModal;

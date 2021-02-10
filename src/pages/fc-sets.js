@@ -2,86 +2,74 @@ import React, { useState } from "react";
 import { PageHeader, Button } from "antd";
 import { Layout, List } from "antd";
 import FCSetsCard from "../components/fc-sets-card";
-import FCSetsCardModal from "../components/fc-sets-card-modal";
+import FCSetsModal from "../components/fc-sets-modal";
 
 const { Content } = Layout;
 
 const data = [
   {
-    title: "Vocab 1",
+    title: "In dui magna posuere eget In dui magna posuere eget",
     id: 1,
-    description: "beep",
+    description:
+      "Nulla sit amet est. Suspendisse faucibus, nunc et pellentesque egestas, lacus ante convallis tellus.",
+    count: 32,
   },
   {
     title: "Vocab 2",
     id: 2,
     description: "boop",
+    count: 24,
   },
   {
     title: "Vocab 3",
     id: 3,
     description: "boop",
+    count: 16,
   },
 ];
 
 const FCSets = () => {
-  const [cardModalEditVisible, setCardModalEditVisible] = useState(false);
+  const [modalEditVisible, setModalEditVisible] = useState(false);
 
-  const [cardModalAction, setCardModalAction] = useState(null);
+  const [modalEditAction, setModalEditAction] = useState(null);
 
-  const onCardModalOpen = (action) => {
-    setCardModalAction(action);
-    setCardModalEditVisible(true);
-  };
-
-  const onCardDelete = (id) => {
-    console.log(`removing ${id}`);
+  const onModalEditOpen = (action) => {
+    setModalEditAction(action);
+    setModalEditVisible(true);
   };
 
   return (
-    <>
-      <FCSetsCardModal
-        visible={cardModalEditVisible}
-        setVisible={setCardModalEditVisible}
-        action={cardModalAction}
+    <Layout className="content-layout">
+      <FCSetsModal
+        visible={modalEditVisible}
+        setVisible={setModalEditVisible}
+        action={modalEditAction}
       />
-
-      <div className="content-container">
-        <PageHeader
-          title="Flash Card Sets"
-          className="content-page-header"
-          extra={[
-            <Button
-              key="1"
-              type="primary"
-              onClick={() => onCardModalOpen("add")}
-            >
-              New Set
-            </Button>,
-          ]}
-        >
-          <Content className="content">
-            <div className="site-card-wrapper">
-              <List
-                grid={{
-                  gutter: 16,
-                }}
-                dataSource={data}
-                renderItem={(item) => (
-                  <List.Item>
-                    <FCSetsCard
-                      item={item}
-                      onCardModalOpen={onCardModalOpen}
-                      onCardDelete={onCardDelete}
-                    />
-                  </List.Item>
-                )}
-              />
-            </div>
-          </Content>
-        </PageHeader>
-      </div>
-    </>
+      <PageHeader
+        title="Flash Card Sets"
+        className="content-page-header"
+        extra={[
+          <Button key="1" type="primary" onClick={() => onModalEditOpen("add")}>
+            New Set
+          </Button>,
+        ]}
+      />
+      <Content className="content">
+        <div className="site-card-wrapper">
+          <List
+            grid={{
+              gutter: 16,
+            }}
+            dataSource={data}
+            renderItem={(item) => (
+              <List.Item>
+                <FCSetsCard item={item} onCardModalOpen={onModalEditOpen} />
+              </List.Item>
+            )}
+          />
+        </div>
+      </Content>
+    </Layout>
   );
 };
 

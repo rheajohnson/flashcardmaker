@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Layout, Spin, Input, PageHeader, Button, List } from "antd";
-import FCListModal from "../components/fc-list-modal";
-import DeleteConfirm from "../components/delete-confirm";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
 const { Content } = Layout;
 
@@ -23,14 +20,6 @@ const data = [
 const FCList = ({ name = data[0].title }) => {
   const [loading, setLoading] = useState(false);
   const [dataFiltered, setDataFiltered] = useState(data);
-
-  const [modalEditVisible, setModalEditVisible] = useState(false);
-  const [modalEditAction, setModalEditAction] = useState(null);
-
-  const onModalEditOpen = (action) => {
-    setModalEditAction(action);
-    setModalEditVisible(true);
-  };
 
   const pageHeaderTitle = (name) => {
     return (
@@ -58,11 +47,6 @@ const FCList = ({ name = data[0].title }) => {
 
   return (
     <Layout className="content-layout">
-      <FCListModal
-        visible={modalEditVisible}
-        setVisible={setModalEditVisible}
-        action={modalEditAction}
-      />
       <PageHeader
         title={pageHeaderTitle(name)}
         className="content-page-header"
@@ -75,11 +59,7 @@ const FCList = ({ name = data[0].title }) => {
             style={{ width: 200 }}
             key="3"
           />,
-          <Button
-            key="2"
-            type="Secondary"
-            onClick={() => onModalEditOpen("add")}
-          >
+          <Button key="2" type="Secondary">
             New Card
           </Button>,
           <Button key="1" type="primary">
@@ -100,14 +80,8 @@ const FCList = ({ name = data[0].title }) => {
             renderItem={(item) => (
               <List.Item
                 actions={[
-                  <EditOutlined
-                    onClick={() => onModalEditOpen("edit")}
-                    key={item.id}
-                  />,
-                  <DeleteOutlined
-                    onClick={() => DeleteConfirm(item.id)}
-                    key={item.id}
-                  />,
+                  <a key="list-loadmore-edit">edit</a>,
+                  <a key="list-loadmore-more">delete</a>,
                 ]}
               >
                 <List.Item.Meta
