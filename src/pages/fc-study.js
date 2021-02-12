@@ -24,7 +24,7 @@ const FCList = ({ name = data[0].title }) => {
   const pageHeaderTitle = (name) => {
     return (
       <>
-        <Link to={"/"}>Flash Card Sets</Link>
+        <Link to={"/"}>Flashcard Sets</Link>
         {" > "}
         {name}
       </>

@@ -46,7 +46,7 @@ const FCSets = () => {
         action={modalEditAction}
       />
       <PageHeader
-        title="Flash Card Sets"
+        title="Flashcard Sets"
         className="content-page-header"
         extra={[
           <Button key="1" type="primary" onClick={() => onModalEditOpen("add")}>

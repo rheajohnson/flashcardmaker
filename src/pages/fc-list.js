@@ -21,7 +21,7 @@ const data = [
 ];
 
 const FCList = ({ name = data[0].title }) => {
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const [dataFiltered, setDataFiltered] = useState(data);
 
   const [modalEditVisible, setModalEditVisible] = useState(false);
@@ -35,7 +35,7 @@ const FCList = ({ name = data[0].title }) => {
   const pageHeaderTitle = (name) => {
     return (
       <>
-        <Link to={"/"}>Flash Card Sets</Link>
+        <Link to={"/"}>Flashcard Sets</Link>
         {" > "}
         {name}
       </>

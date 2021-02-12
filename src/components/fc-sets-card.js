@@ -12,22 +12,34 @@ const FCSetsCard = ({ item, onCardModalOpen }) => {
 
   const content = (onCardModalOpen) => (
     <div className="fc-card-modal-content">
-      <p
-        onClick={(e) => {
+      <div
+        role="button"
+        tabIndex={0}
+        onKeyDown={() => {
+          setPopoverVisible(false);
+          onCardModalOpen("edit");
+        }}
+        onClick={() => {
           setPopoverVisible(false);
           onCardModalOpen("edit");
         }}
       >
         Edit
-      </p>
-      <p
-        onClick={(e) => {
+      </div>
+      <div
+        role="button"
+        tabIndex={0}
+        onKeyDown={() => {
+          setPopoverVisible(false);
+          DeleteConfirm();
+        }}
+        onClick={() => {
           setPopoverVisible(false);
           DeleteConfirm();
         }}
       >
         Delete
-      </p>
+      </div>
     </div>
   );
 
