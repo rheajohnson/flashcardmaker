@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Redirect } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { Link, useHistory, Redirect } from "react-router-dom";
 
 import { Form, Input, Button } from "antd";
 import { UserOutlined, LockOutlined, MailOutlined } from "@ant-design/icons";
@@ -12,7 +11,9 @@ const { Title, Text } = Typography;
 
 import { register } from "../redux/actions/auth";
 
-const RegisterForm = (props) => {
+import { setMessage } from "../redux/actions/message";
+
+const RegisterForm = () => {
   const [loading, setLoading] = useState(false);
 
   const { isLoggedIn } = useSelector((state) => state.auth);
@@ -20,15 +21,18 @@ const RegisterForm = (props) => {
 
   const dispatch = useDispatch();
 
-  const handleRegister = ({ username, password }) => {
+  const history = useHistory();
+
+  useEffect(() => {
+    dispatch(setMessage(""));
+  }, []);
+
+  const handleRegister = ({ username, email, password }) => {
     setLoading(true);
 
-    console.log(message);
-
-    dispatch(register(username, password))
+    dispatch(register(username, email, password))
       .then(() => {
-        props.history.push("/");
-        window.location.reload();
+        history.push("/");
       })
       .catch(() => {
         setLoading(false);
@@ -76,7 +80,6 @@ const RegisterForm = (props) => {
             placeholder="Password"
           />
         </Form.Item>
-
         {message && (
           <div className="login-form-error">
             <Text type="danger"> {message}</Text>
@@ -91,8 +94,12 @@ const RegisterForm = (props) => {
           >
             {loading ? "Signing up" : "Sign up"}
           </Button>
-          Or <Link to="/login">Sign in</Link>
         </Form.Item>
+        <div className="login-form-alternative-action-container">
+          <Text>
+            Have an account? <Link to="/login">Sign in</Link>
+          </Text>
+        </div>
       </Form>
     </div>
   );

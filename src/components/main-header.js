@@ -1,19 +1,38 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Layout, Menu } from "antd";
 import { Link, useHistory } from "react-router-dom";
 import logo from "../assets/logo.svg";
 import { Button } from "antd";
 const { Header } = Layout;
+import { logout } from "../redux/actions/auth";
 
 const MainHeader = () => {
   const { isLoggedIn } = useSelector((state) => state.auth);
   const [selected, setSelected] = useState(["1"]);
   const history = useHistory();
 
+  const dispatch = useDispatch();
+
   const onSignUpButtonClick = () => {
     setSelected([""]);
     history.push("/register");
+  };
+
+  const onSignOutButtonClick = async () => {
+    setSelected(["2"]);
+    dispatch(logout()).then(() => {
+      history.push("/login");
+    });
+  };
+
+  const onMenuItemClick = (key) => {
+    const menuItemMap = {
+      "1": "/",
+      "2": "/login",
+    };
+    setSelected([key]);
+    history.push(menuItemMap[key]);
   };
 
   return (
@@ -24,6 +43,15 @@ const MainHeader = () => {
         </div>
       </Link>
       <Menu theme="dark" mode="horizontal" selectedKeys={selected}>
+        {isLoggedIn && (
+          <Button
+            type="primary"
+            className="header-button"
+            onClick={() => onSignOutButtonClick()}
+          >
+            Sign Out
+          </Button>
+        )}
         {!isLoggedIn && (
           <Button
             type="primary"
@@ -37,17 +65,17 @@ const MainHeader = () => {
           <Menu.Item
             key="2"
             className="header-item"
-            onClick={() => setSelected(["2"])}
+            onClick={({ key }) => onMenuItemClick(key)}
           >
-            <Link to="/login">Sign In</Link>
+            Sign In
           </Menu.Item>
         )}
         <Menu.Item
           key="1"
           className="header-item"
-          onClick={() => setSelected(["1"])}
+          onClick={({ key }) => onMenuItemClick(key)}
         >
-          <Link to="/">Flashcards</Link>
+          Flashcards
         </Menu.Item>
       </Menu>
     </Header>

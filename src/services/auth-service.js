@@ -1,32 +1,51 @@
-import axios from "axios";
+import AmplifyClient from "../client/amplify-client";
 
-const API_URL = "http://localhost:8080/api/auth/";
-
-const register = (username, email, password) => {
-  return axios.post(API_URL + "signup", {
+const register = async (username, email, password) => {
+  const amplifyClient = AmplifyClient();
+  const { user } = await amplifyClient.signUp({
     username,
-    email,
     password,
+    email,
   });
+  console.log(user);
+  await amplifyClient.confirmSignUp(user.username);
 };
 
 const login = async (username, password) => {
-  const response = await axios.post(API_URL + "signin", {
+  const amplifyClient = AmplifyClient();
+  const user = await amplifyClient.signIn({
     username,
     password,
   });
-  if (response.data.accessToken) {
-    localStorage.setItem("user", JSON.stringify(response.data));
-  }
-  return response.data;
+  return user;
 };
 
-const logout = () => {
-  localStorage.removeItem("user");
+const getAccessToken = async () => {
+  const amplifyClient = AmplifyClient();
+  return await amplifyClient.currentSession().then((res) => {
+    let accessToken = res.getIdToken();
+    let jwt = accessToken.getJwtToken();
+    //You can print them to see the full objects
+    return JSON.stringify(jwt);
+  });
+};
+
+const getSession = async () => {
+  const amplifyClient = AmplifyClient();
+  return await amplifyClient.currentSession().then((res) => {
+    return res.accessToken;
+  });
+};
+
+const logout = async () => {
+  const amplifyClient = AmplifyClient();
+  await amplifyClient.signOut({ global: true });
 };
 
 export default {
   register,
   login,
+  getAccessToken,
   logout,
+  getSession,
 };

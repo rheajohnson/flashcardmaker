@@ -1,14 +1,23 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { Card } from "antd";
 import { Link } from "react-router-dom";
 import { EllipsisOutlined } from "@ant-design/icons";
 import { Popover } from "antd";
 import DeleteConfirm from "./delete-confirm";
 
+import { deleteSet } from "../redux/actions/sets";
+
 const { Meta } = Card;
 
 const FCSetsCard = ({ item, onCardModalOpen }) => {
   const [popOverVisible, setPopoverVisible] = useState(false);
+
+  const dispatch = useDispatch();
+
+  const handleDelete = async (id) => {
+    dispatch(deleteSet(id));
+  };
 
   const content = (onCardModalOpen) => (
     <div className="fc-card-modal-content">
@@ -31,11 +40,11 @@ const FCSetsCard = ({ item, onCardModalOpen }) => {
         tabIndex={0}
         onKeyDown={() => {
           setPopoverVisible(false);
-          DeleteConfirm();
+          DeleteConfirm(item.id, handleDelete);
         }}
         onClick={() => {
           setPopoverVisible(false);
-          DeleteConfirm();
+          DeleteConfirm(item.id, handleDelete);
         }}
       >
         Delete
@@ -52,7 +61,7 @@ const FCSetsCard = ({ item, onCardModalOpen }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="fc-card-content">
-          <Meta title={item.title} description={`Total Cards: ${item.count}`} />
+          <Meta title={item.name} description={`Total Cards: ${item.count}`} />
         </div>
 
         <Popover

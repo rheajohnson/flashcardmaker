@@ -1,12 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import FCSets from "./pages/fc-sets";
 import FCList from "./pages/fc-list";
 import Login from "./pages/login";
 import Register from "./pages/register";
 import MainHeader from "./components/main-header";
+import AuthService from "./services/auth-service";
+import { setUser } from "./redux/actions/auth";
 
 const App = () => {
+  const dispatch = useDispatch();
+  useEffect(async () => {
+    const activeSession = await AuthService.getSession();
+    if (activeSession) dispatch(setUser(activeSession.username));
+  }, []);
   return (
     <Router>
       <MainHeader />

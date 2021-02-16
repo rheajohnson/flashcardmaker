@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -12,6 +12,8 @@ const { Title, Text } = Typography;
 
 import { login } from "../redux/actions/auth";
 
+import { setMessage } from "../redux/actions/message";
+
 const LoginForm = (props) => {
   const [loading, setLoading] = useState(false);
 
@@ -19,6 +21,10 @@ const LoginForm = (props) => {
   const { message } = useSelector((state) => state.message);
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(setMessage(""));
+  }, []);
 
   const handleLogin = ({ username, password }) => {
     setLoading(true);
@@ -80,8 +86,12 @@ const LoginForm = (props) => {
           >
             {loading ? "Logging in" : "Log in"}
           </Button>
-          Or <Link to="/register">Register</Link>
         </Form.Item>
+        <div className="login-form-alternative-action-container">
+          <Text>
+            No account? <Link to="/register">Sign up</Link>
+          </Text>
+        </div>
       </Form>
     </div>
   );

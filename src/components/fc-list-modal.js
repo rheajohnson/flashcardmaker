@@ -26,7 +26,7 @@ const FCListModal = ({ visible, setVisible, action }) => {
     <>
       <Modal
         visible={visible}
-        title={`${action === "edit" ? "Edit Card" : "Add Card"} `}
+        title={`${action === "edit" ? "Edit Card" : "New Card"} `}
         onOk={handleOk}
         onCancel={handleCancel}
         footer={[

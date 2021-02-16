@@ -1,15 +1,32 @@
 import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { Modal, Button } from "antd";
 import { Form, Input } from "antd";
+
+import { updateSet, addSet } from "../redux/actions/sets";
 
 const FCSetsModal = ({ visible, setVisible, action }) => {
   const [loading, setLoading] = useState(false);
 
-  const handleOk = () => {
+  const { selectedSet } = useSelector((state) => state.sets);
+
+  const dispatch = useDispatch();
+
+  const handleOk = async ({ name, description }) => {
     setLoading(true);
-    setTimeout(() => {
+    try {
+      if (action === "edit") {
+        dispatch(updateSet(name, description, selectedSet.id));
+      }
+      if (action === "add") {
+        dispatch(addSet(name, description));
+      }
+      setVisible(false);
       setLoading(false);
-    }, 3000);
+    } catch (e) {
+      console.error(e);
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -17,7 +34,14 @@ const FCSetsModal = ({ visible, setVisible, action }) => {
   };
 
   useEffect(() => {
-    setVisible(visible);
+    if (!visible) {
+      form.setFieldsValue({ name: "", description: "" });
+    } else if (selectedSet && action === "edit") {
+      form.setFieldsValue({
+        name: selectedSet.name,
+        description: selectedSet.description,
+      });
+    }
   });
 
   const [form] = Form.useForm();
@@ -26,9 +50,7 @@ const FCSetsModal = ({ visible, setVisible, action }) => {
     <>
       <Modal
         visible={visible}
-        title={`${action === "edit" ? "Edit Set" : "Add New Set"} `}
-        onOk={handleOk}
-        onCancel={handleCancel}
+        title={`${action === "edit" ? "Edit Set" : "New Set"} `}
         footer={[
           <Button key="back" onClick={handleCancel}>
             Cancel
@@ -37,17 +59,17 @@ const FCSetsModal = ({ visible, setVisible, action }) => {
             key="submit"
             type="primary"
             loading={loading}
-            onClick={handleOk}
+            onClick={form.submit}
           >
             Save
           </Button>,
         ]}
       >
-        <Form form={form} layout="vertical">
-          <Form.Item label="Name" required>
+        <Form form={form} layout="vertical" onFinish={handleOk}>
+          <Form.Item label="Name" name="name" required>
             <Input />
           </Form.Item>
-          <Form.Item label="Description">
+          <Form.Item label="Description" name="description">
             <Input />
           </Form.Item>
         </Form>

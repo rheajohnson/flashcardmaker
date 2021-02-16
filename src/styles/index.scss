@@ -41,16 +41,25 @@
 .fc-card {
   width: 280px;
   padding-top: 8px;
+  height: 146px;
+  display: flex;
+  align-items: center;
   .fc-card-ellipsis {
     position: absolute;
     top: 12px;
     right: 24px;
     font-size: 16px;
   }
+  .ant-card-body {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .fc-card-modal-content {
   min-width: 64px;
+  text-overflow: ellipsis;
   :hover {
     cursor: pointer;
   }
@@ -73,14 +82,11 @@
   background-color: white;
   padding: 32px;
   border-radius: 4px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
   .login-form {
-    min-width: 240px;
-  }
-  .login-form-forgot {
-    float: right;
-  }
-  .ant-col-rtl .login-form-forgot {
-    float: left;
+    width: 240px;
   }
   .login-form-button {
     width: 100%;
@@ -89,12 +95,15 @@
     margin-bottom: 24px;
   }
   .login-form-error {
-    height: 40px;
     background-color: rgb(255, 226, 226);
     margin-bottom: 12px;
     display: flex;
     align-items: center;
-    padding: 8px;
+    padding: 12px;
+  }
+  .login-form-alternative-action-container {
+    display: flex;
+    justify-content: center;
   }
 }
 
