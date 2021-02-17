@@ -46,12 +46,7 @@ const LoginForm = (props) => {
   return (
     <div className="login-form-container">
       <Title level={2}>Sign in</Title>
-      <Form
-        name="normal_login"
-        className="login-form"
-        initialValues={{ remember: true }}
-        onFinish={handleLogin}
-      >
+      <Form name="normal_login" className="login-form" onFinish={handleLogin}>
         <Form.Item
           name="username"
           rules={[{ required: true, message: "Please input your Username" }]}

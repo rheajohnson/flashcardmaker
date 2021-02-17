@@ -42,25 +42,25 @@ const MainHeader = () => {
           <img src={logo} alt="Flashcard Maker" />
         </div>
       </Link>
+      {isLoggedIn && (
+        <Button
+          type="primary"
+          className="header-button"
+          onClick={() => onSignOutButtonClick()}
+        >
+          Sign Out
+        </Button>
+      )}
+      {!isLoggedIn && (
+        <Button
+          type="primary"
+          className="header-button"
+          onClick={onSignUpButtonClick}
+        >
+          Sign Up
+        </Button>
+      )}
       <Menu theme="dark" mode="horizontal" selectedKeys={selected}>
-        {isLoggedIn && (
-          <Button
-            type="primary"
-            className="header-button"
-            onClick={() => onSignOutButtonClick()}
-          >
-            Sign Out
-          </Button>
-        )}
-        {!isLoggedIn && (
-          <Button
-            type="primary"
-            className="header-button"
-            onClick={onSignUpButtonClick}
-          >
-            Sign Up
-          </Button>
-        )}
         {!isLoggedIn && (
           <Menu.Item
             key="2"

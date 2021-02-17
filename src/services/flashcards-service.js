@@ -1,10 +1,10 @@
 import AuthService from "./auth-service";
 import axios from "axios";
 
-const getAllSets = async () => {
+const getAllFlashcards = async (id) => {
   const token = await AuthService.getAccessToken();
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
-  const url = `${baseUrl}/sets`;
+  const url = `${baseUrl}/sets/${id}/flashcards`;
   const response = await axios.get(url, {
     headers: {
       "Access-Control-Allow-Origin": "*",
@@ -14,16 +14,16 @@ const getAllSets = async () => {
   return response.data;
 };
 
-const createSet = async (name, description) => {
+const createFlashcard = async (front, back, id) => {
   const token = await AuthService.getAccessToken();
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
-  const url = `${baseUrl}/sets`;
+  const url = `${baseUrl}/sets/${id}/flashcards`;
 
   const response = await axios.post(
     url,
     {
-      name,
-      description,
+      front,
+      back,
     },
     {
       headers: {
@@ -35,16 +35,16 @@ const createSet = async (name, description) => {
   return response.data;
 };
 
-const updateSet = async (name, description, id) => {
+const updateFlashcard = async (front, back, setId, flashcardId) => {
   const token = await AuthService.getAccessToken();
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
-  const url = `${baseUrl}/sets/${id}`;
+  const url = `${baseUrl}/sets/${setId}/flashcards/${flashcardId}`;
 
   const response = await axios.put(
     url,
     {
-      name,
-      description,
+      front,
+      back,
     },
     {
       headers: {
@@ -53,13 +53,14 @@ const updateSet = async (name, description, id) => {
       },
     }
   );
+  console.log("RESPONSE: ", response);
   return response.data;
 };
 
-const deleteSet = async (id) => {
+const deleteFlashcard = async (setId, flashcardId) => {
   const token = await AuthService.getAccessToken();
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
-  const url = `${baseUrl}/sets/${id}`;
+  const url = `${baseUrl}/sets/${setId}/flashcards/${flashcardId}`;
 
   const response = await axios.delete(url, {
     headers: {
@@ -70,4 +71,9 @@ const deleteSet = async (id) => {
   return response.data;
 };
 
-export default { getAllSets, createSet, deleteSet, updateSet };
+export default {
+  getAllFlashcards,
+  createFlashcard,
+  updateFlashcard,
+  deleteFlashcard,
+};

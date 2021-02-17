@@ -12,14 +12,32 @@ const FCSets = () => {
   const [modalEditVisible, setModalEditVisible] = useState(false);
   const [modalEditAction, setModalEditAction] = useState(null);
   const { allSets } = useSelector((state) => state.sets);
+  const [setsFiltered, setSetsFiltered] = useState([]);
 
   const dispatch = useDispatch();
+
+  const sortData = (data) => {
+    return data.sort(function (a, b) {
+      if (a.name < b.name) {
+        return -1;
+      }
+      if (a.name > b.name) {
+        return 1;
+      }
+      return 0;
+    });
+  };
 
   useEffect(async () => {
     if (!allSets.length) {
       dispatch(getAllSets());
     }
   }, []);
+
+  useEffect(() => {
+    const dataSorted = sortData(allSets);
+    setSetsFiltered(dataSorted);
+  }, [allSets]);
 
   const onModalEditOpen = (action, id) => {
     if (id) {
@@ -52,7 +70,7 @@ const FCSets = () => {
             grid={{
               gutter: 16,
             }}
-            dataSource={allSets}
+            dataSource={setsFiltered}
             renderItem={(item) => (
               <List.Item>
                 <FCSetsCard

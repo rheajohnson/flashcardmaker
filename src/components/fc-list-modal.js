@@ -1,34 +1,60 @@
 import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { Modal, Button } from "antd";
 import { Form, Input } from "antd";
 
+import { updateFlashcard, addFlashcard } from "../redux/actions/flashcards";
+import { getAllSets } from "../redux/actions/sets";
+
 const FCListModal = ({ visible, setVisible, action }) => {
   const [loading, setLoading] = useState(false);
+  const { selectedFlashcard } = useSelector((state) => state.flashcards);
+  const { selectedSet } = useSelector((state) => state.sets);
+  const [form] = Form.useForm();
 
-  const handleOk = () => {
+  const dispatch = useDispatch();
+
+  const handleOk = async ({ front, back }) => {
     setLoading(true);
-    setTimeout(() => {
+    try {
+      if (action === "edit") {
+        dispatch(
+          updateFlashcard(front, back, selectedSet.id, selectedFlashcard.id)
+        );
+      }
+      if (action === "add") {
+        dispatch(addFlashcard(front, back, selectedSet.id)).then(() =>
+          dispatch(getAllSets())
+        );
+      }
+      setVisible(false);
       setLoading(false);
-    }, 3000);
+    } catch (e) {
+      console.error(e);
+      setLoading(false);
+    }
   };
-
   const handleCancel = () => {
     setVisible(false);
   };
 
   useEffect(() => {
-    setVisible(visible);
-  });
-
-  const [form] = Form.useForm();
+    if (!visible) {
+      form.setFieldsValue({ front: "", back: "" });
+    } else if (selectedFlashcard && action === "edit") {
+      form.setFieldsValue({
+        front: selectedFlashcard.front,
+        back: selectedFlashcard.back,
+      });
+    }
+  }, [visible]);
 
   return (
     <>
       <Modal
         visible={visible}
-        title={`${action === "edit" ? "Edit Card" : "New Card"} `}
-        onOk={handleOk}
         onCancel={handleCancel}
+        title={`${action === "edit" ? "Edit Card" : "New Card"} `}
         footer={[
           <Button key="back" onClick={handleCancel}>
             Cancel
@@ -37,17 +63,18 @@ const FCListModal = ({ visible, setVisible, action }) => {
             key="submit"
             type="primary"
             loading={loading}
-            onClick={handleOk}
+            onClick={form.submit}
           >
             Save
           </Button>,
         ]}
+        forceRender
       >
-        <Form form={form} layout="vertical">
-          <Form.Item label="Front" required>
+        <Form form={form} layout="vertical" onFinish={handleOk}>
+          <Form.Item label="Front" name="front" required>
             <Input />
           </Form.Item>
-          <Form.Item label="Back" required>
+          <Form.Item label="Back" name="back">
             <Input />
           </Form.Item>
         </Form>

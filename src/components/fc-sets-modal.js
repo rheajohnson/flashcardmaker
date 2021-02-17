@@ -7,6 +7,7 @@ import { updateSet, addSet } from "../redux/actions/sets";
 
 const FCSetsModal = ({ visible, setVisible, action }) => {
   const [loading, setLoading] = useState(false);
+  const [form] = Form.useForm();
 
   const { selectedSet } = useSelector((state) => state.sets);
 
@@ -42,15 +43,14 @@ const FCSetsModal = ({ visible, setVisible, action }) => {
         description: selectedSet.description,
       });
     }
-  });
-
-  const [form] = Form.useForm();
+  }, [visible]);
 
   return (
     <>
       <Modal
         visible={visible}
         title={`${action === "edit" ? "Edit Set" : "New Set"} `}
+        onCancel={handleCancel}
         footer={[
           <Button key="back" onClick={handleCancel}>
             Cancel
@@ -64,6 +64,7 @@ const FCSetsModal = ({ visible, setVisible, action }) => {
             Save
           </Button>,
         ]}
+        forceRender
       >
         <Form form={form} layout="vertical" onFinish={handleOk}>
           <Form.Item label="Name" name="name" required>
