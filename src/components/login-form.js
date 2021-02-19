@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 import { Form, Input, Button } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
@@ -17,10 +17,16 @@ import { setMessage } from "../redux/actions/message";
 const LoginForm = (props) => {
   const [loading, setLoading] = useState(false);
 
-  const { isLoggedIn } = useSelector((state) => state.auth);
+  const { isLoggedIn, userConfirmed } = useSelector((state) => state.auth);
   const { message } = useSelector((state) => state.message);
 
   const dispatch = useDispatch();
+
+  const history = useHistory();
+
+  useEffect(() => {
+    if (userConfirmed === false) history.push("/register");
+  });
 
   useEffect(() => {
     dispatch(setMessage(""));
@@ -79,7 +85,7 @@ const LoginForm = (props) => {
             className="login-form-button"
             loading={loading}
           >
-            {loading ? "Logging in" : "Log in"}
+            Log in
           </Button>
         </Form.Item>
         <div className="login-form-alternative-action-container">

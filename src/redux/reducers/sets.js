@@ -1,6 +1,11 @@
-import { SET_ALL_SETS, SET_SET, CLEAR_SET } from "../actions/types";
+import {
+  SET_ALL_SETS,
+  SET_SET,
+  CLEAR_SET,
+  SET_PUBLIC_SETS,
+} from "../actions/types";
 
-const initialState = { allSets: [], selectedSet: {} };
+const initialState = { allSets: [], publicSets: [], selectedSet: {} };
 
 export default function (state = initialState, action) {
   const { type, payload } = action;
@@ -9,6 +14,11 @@ export default function (state = initialState, action) {
       return {
         ...state,
         allSets: payload,
+      };
+    case SET_PUBLIC_SETS:
+      return {
+        ...state,
+        publicSets: payload,
       };
     case SET_SET:
       return {

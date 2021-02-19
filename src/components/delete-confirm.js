@@ -8,7 +8,7 @@ const DeleteConfirm = async (id, fn) => {
     icon: <ExclamationCircleOutlined />,
     okText: "Delete",
     cancelText: "Cancel",
-    onOk: async () => fn(id),
+    onOk: async () => await fn(id),
     onCancel() {},
   });
 };

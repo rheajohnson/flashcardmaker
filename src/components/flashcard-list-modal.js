@@ -3,44 +3,51 @@ import { useSelector, useDispatch } from "react-redux";
 import { Modal, Button } from "antd";
 import { Form, Input } from "antd";
 
-import { updateSet, addSet } from "../redux/actions/sets";
+import { updateFlashcard, addFlashcard } from "../redux/actions/flashcards";
+import { getUserSets } from "../redux/actions/sets";
 
-const FCSetsModal = ({ visible, setVisible, action }) => {
+const FlashcardListModal = ({ visible, setVisible, action }) => {
   const [loading, setLoading] = useState(false);
-  const [form] = Form.useForm();
-
+  const { selectedFlashcard } = useSelector((state) => state.flashcards);
   const { selectedSet } = useSelector((state) => state.sets);
+  const [form] = Form.useForm();
 
   const dispatch = useDispatch();
 
-  const handleOk = async ({ name, description }) => {
+  const handleOk = async ({ front, back }) => {
     setLoading(true);
     try {
       if (action === "edit") {
-        dispatch(updateSet(name, description, selectedSet.id));
+        dispatch(
+          updateFlashcard(front, back, selectedSet.id, selectedFlashcard.id)
+        ).then(() => {
+          setVisible(false);
+          setLoading(false);
+        });
       }
       if (action === "add") {
-        dispatch(addSet(name, description));
+        dispatch(addFlashcard(front, back, selectedSet.id)).then(() => {
+          setVisible(false);
+          setLoading(false);
+          dispatch(getUserSets());
+        });
       }
-      setVisible(false);
-      setLoading(false);
     } catch (e) {
       console.error(e);
       setLoading(false);
     }
   };
-
   const handleCancel = () => {
     setVisible(false);
   };
 
   useEffect(() => {
     if (!visible) {
-      form.setFieldsValue({ name: "", description: "" });
-    } else if (selectedSet && action === "edit") {
+      form.setFieldsValue({ front: "", back: "" });
+    } else if (selectedFlashcard && action === "edit") {
       form.setFieldsValue({
-        name: selectedSet.name,
-        description: selectedSet.description,
+        front: selectedFlashcard.front,
+        back: selectedFlashcard.back,
       });
     }
   }, [visible]);
@@ -49,8 +56,8 @@ const FCSetsModal = ({ visible, setVisible, action }) => {
     <>
       <Modal
         visible={visible}
-        title={`${action === "edit" ? "Edit Set" : "New Set"} `}
         onCancel={handleCancel}
+        title={`${action === "edit" ? "Edit Card" : "New Card"} `}
         footer={[
           <Button key="back" onClick={handleCancel}>
             Cancel
@@ -67,10 +74,10 @@ const FCSetsModal = ({ visible, setVisible, action }) => {
         forceRender
       >
         <Form form={form} layout="vertical" onFinish={handleOk}>
-          <Form.Item label="Name" name="name" required>
+          <Form.Item label="Front" name="front" required>
             <Input />
           </Form.Item>
-          <Form.Item label="Description" name="description">
+          <Form.Item label="Back" name="back" required>
             <Input />
           </Form.Item>
         </Form>
@@ -79,4 +86,4 @@ const FCSetsModal = ({ visible, setVisible, action }) => {
   );
 };
 
-export default FCSetsModal;
+export default FlashcardListModal;

@@ -3,48 +3,48 @@ import { useSelector, useDispatch } from "react-redux";
 import { Modal, Button } from "antd";
 import { Form, Input } from "antd";
 
-import { updateFlashcard, addFlashcard } from "../redux/actions/flashcards";
-import { getAllSets } from "../redux/actions/sets";
+import { updateSet, addSet } from "../redux/actions/sets";
 
-const FCListModal = ({ visible, setVisible, action }) => {
+const SetsModal = ({ visible, setVisible, action }) => {
   const [loading, setLoading] = useState(false);
-  const { selectedFlashcard } = useSelector((state) => state.flashcards);
-  const { selectedSet } = useSelector((state) => state.sets);
   const [form] = Form.useForm();
+
+  const { selectedSet } = useSelector((state) => state.sets);
 
   const dispatch = useDispatch();
 
-  const handleOk = async ({ front, back }) => {
+  const handleOk = async ({ name, description }) => {
     setLoading(true);
     try {
       if (action === "edit") {
-        dispatch(
-          updateFlashcard(front, back, selectedSet.id, selectedFlashcard.id)
-        );
+        dispatch(updateSet(name, description, selectedSet.id)).then(() => {
+          setVisible(false);
+          setLoading(false);
+        });
       }
       if (action === "add") {
-        dispatch(addFlashcard(front, back, selectedSet.id)).then(() =>
-          dispatch(getAllSets())
-        );
+        dispatch(addSet(name, description)).then(() => {
+          setVisible(false);
+          setLoading(false);
+        });
       }
-      setVisible(false);
-      setLoading(false);
     } catch (e) {
       console.error(e);
       setLoading(false);
     }
   };
+
   const handleCancel = () => {
     setVisible(false);
   };
 
   useEffect(() => {
     if (!visible) {
-      form.setFieldsValue({ front: "", back: "" });
-    } else if (selectedFlashcard && action === "edit") {
+      form.setFieldsValue({ name: "", description: "" });
+    } else if (selectedSet && action === "edit") {
       form.setFieldsValue({
-        front: selectedFlashcard.front,
-        back: selectedFlashcard.back,
+        name: selectedSet.name,
+        description: selectedSet.description,
       });
     }
   }, [visible]);
@@ -53,8 +53,8 @@ const FCListModal = ({ visible, setVisible, action }) => {
     <>
       <Modal
         visible={visible}
+        title={`${action === "edit" ? "Edit Set" : "New Set"} `}
         onCancel={handleCancel}
-        title={`${action === "edit" ? "Edit Card" : "New Card"} `}
         footer={[
           <Button key="back" onClick={handleCancel}>
             Cancel
@@ -71,16 +71,16 @@ const FCListModal = ({ visible, setVisible, action }) => {
         forceRender
       >
         <Form form={form} layout="vertical" onFinish={handleOk}>
-          <Form.Item label="Front" name="front" required>
+          <Form.Item label="Name" name="name" required>
             <Input />
           </Form.Item>
-          <Form.Item label="Back" name="back">
+          {/* <Form.Item label="Description" name="description">
             <Input />
-          </Form.Item>
+          </Form.Item> */}
         </Form>
       </Modal>
     </>
   );
 };
 
-export default FCListModal;
+export default SetsModal;

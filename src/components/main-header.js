@@ -1,43 +1,39 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Layout, Menu } from "antd";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import logo from "../assets/logo.svg";
 import { Button } from "antd";
 const { Header } = Layout;
 import { logout } from "../redux/actions/auth";
 
 const MainHeader = () => {
+  const [selected, setSelected] = useState("");
   const { isLoggedIn } = useSelector((state) => state.auth);
-  const [selected, setSelected] = useState(["1"]);
   const history = useHistory();
-
+  const location = useLocation();
   const dispatch = useDispatch();
 
-  const onSignUpButtonClick = () => {
-    setSelected([""]);
-    history.push("/register");
+  const headerSelectionMap = {
+    "/": "1",
+    "/login": "2",
   };
 
+  useEffect(() => {
+    if (selected !== location.pathname) {
+      setSelected(headerSelectionMap[location.pathname]);
+    }
+  });
+
   const onSignOutButtonClick = async () => {
-    setSelected(["2"]);
     dispatch(logout()).then(() => {
       history.push("/login");
     });
   };
 
-  const onMenuItemClick = (key) => {
-    const menuItemMap = {
-      "1": "/",
-      "2": "/login",
-    };
-    setSelected([key]);
-    history.push(menuItemMap[key]);
-  };
-
   return (
     <Header style={{ position: "fixed", zIndex: 1, top: 0, width: "100%" }}>
-      <Link to="/" onClick={() => setSelected(["1"])}>
+      <Link to="/">
         <div className="logo">
           <img src={logo} alt="Flashcard Maker" />
         </div>
@@ -55,7 +51,7 @@ const MainHeader = () => {
         <Button
           type="primary"
           className="header-button"
-          onClick={onSignUpButtonClick}
+          onClick={() => history.push("/register")}
         >
           Sign Up
         </Button>
@@ -65,7 +61,7 @@ const MainHeader = () => {
           <Menu.Item
             key="2"
             className="header-item"
-            onClick={({ key }) => onMenuItemClick(key)}
+            onClick={() => history.push("/login")}
           >
             Sign In
           </Menu.Item>
@@ -73,7 +69,7 @@ const MainHeader = () => {
         <Menu.Item
           key="1"
           className="header-item"
-          onClick={({ key }) => onMenuItemClick(key)}
+          onClick={() => history.push("/")}
         >
           Flashcards
         </Menu.Item>

@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import FCSets from "./pages/fc-sets";
-import FCList from "./pages/fc-list";
+import Sets from "./pages/sets";
+import FlashcardList from "./pages/flashcard-list";
 import Login from "./pages/login";
 import Register from "./pages/register";
+import Study from "./pages/study";
 import MainHeader from "./components/main-header";
 import AuthService from "./services/auth-service";
 import { setUser } from "./redux/actions/auth";
@@ -12,17 +13,23 @@ import { setUser } from "./redux/actions/auth";
 const App = () => {
   const dispatch = useDispatch();
   useEffect(async () => {
-    const activeSession = await AuthService.getSession();
-    if (activeSession) dispatch(setUser(activeSession.username));
+    try {
+      const activeSession = await AuthService.getSession();
+      if (activeSession)
+        dispatch(setUser({ username: activeSession.username }));
+    } catch (e) {
+      console.log("No active user");
+    }
   }, []);
   return (
     <Router>
       <MainHeader />
       <Switch>
-        <Route path="/" exact component={FCSets} />
-        <Route path="/set/:id" exact component={FCList} />
+        <Route path="/" exact component={Sets} />
+        <Route path="/set/:id" exact component={FlashcardList} />
         <Route path="/login" exact component={Login} />
         <Route path="/register" exact component={Register} />
+        <Route path="/set/:id/study" exact component={Study} />
       </Switch>
     </Router>
   );

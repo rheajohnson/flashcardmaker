@@ -1,4 +1,4 @@
-import { SET_SET, CLEAR_SET, SET_ALL_SETS } from "./types";
+import { SET_SET, CLEAR_SET, SET_ALL_SETS, SET_PUBLIC_SETS } from "./types";
 import SetsService from "../../services/sets-service";
 
 export const setSet = (data) => ({
@@ -10,11 +10,28 @@ export const clearSet = () => ({
   type: CLEAR_SET,
 });
 
-export const getAllSets = () => (dispatch) => {
-  return SetsService.getAllSets().then(
+export const getUserSets = () => (dispatch) => {
+  return SetsService.getUserSets().then(
     (data) => {
       dispatch({
         type: SET_ALL_SETS,
+        payload: data,
+      });
+
+      return Promise.resolve();
+    },
+    (error) => {
+      console.log(error);
+      return Promise.reject();
+    }
+  );
+};
+
+export const getPublicSets = () => (dispatch) => {
+  return SetsService.getPublicSets().then(
+    (data) => {
+      dispatch({
+        type: SET_PUBLIC_SETS,
         payload: data,
       });
 

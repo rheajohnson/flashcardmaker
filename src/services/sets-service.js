@@ -1,17 +1,36 @@
 import AuthService from "./auth-service";
 import axios from "axios";
 
-const getAllSets = async () => {
-  const token = await AuthService.getAccessToken();
+const getUserSets = async (userSetIds = []) => {
+  const getUserSetsResponse = [];
+  for (const userSetId of userSetIds) {
+    const baseUrl = process.env.REACT_APP_API_BASE_URL;
+    const url = `${baseUrl}/sets/${userSetId}`;
+    const response = await axios.get(url, {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
+    getUserSetsResponse.push(response.data);
+  }
+  return getUserSetsResponse;
+};
+
+const getPublicSets = async () => {
+  const publicSetIds = [];
+  const publicSetsResponse = [];
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
-  const url = `${baseUrl}/sets`;
-  const response = await axios.get(url, {
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      Authorization: JSON.parse(token),
-    },
-  });
-  return response.data;
+  for (const publicSetId of publicSetIds) {
+    const url = `${baseUrl}/sets/${publicSetId}`;
+    const response = await axios.get(url, {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
+    publicSetsResponse.push(response.data);
+  }
+
+  return publicSetsResponse;
 };
 
 const createSet = async (name, description) => {
@@ -70,4 +89,4 @@ const deleteSet = async (id) => {
   return response.data;
 };
 
-export default { getAllSets, createSet, deleteSet, updateSet };
+export default { getUserSets, createSet, deleteSet, updateSet, getPublicSets };

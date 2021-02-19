@@ -10,14 +10,14 @@ import { deleteSet, setSet } from "../redux/actions/sets";
 
 const { Meta } = Card;
 
-const FCSetsCard = ({ item, onCardModalOpen }) => {
+const SetsCard = ({ item, onCardModalOpen }) => {
   const [popOverVisible, setPopoverVisible] = useState(false);
   const { allSets } = useSelector((state) => state.sets);
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const handleDelete = async (id) => {
-    dispatch(deleteSet(id));
+  const handleDelete = (id) => {
+    return dispatch(deleteSet(id));
   };
 
   const handleSelect = (id) => {
@@ -100,4 +100,4 @@ const FCSetsCard = ({ item, onCardModalOpen }) => {
   );
 };
 
-export default FCSetsCard;
+export default SetsCard;

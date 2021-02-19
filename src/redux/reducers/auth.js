@@ -10,8 +10,8 @@ import {
 const user = JSON.parse(localStorage.getItem("user"));
 
 const initialState = user
-  ? { isLoggedIn: true, user }
-  : { isLoggedIn: false, user: null };
+  ? { isLoggedIn: true, user, userConfirmed: true }
+  : { isLoggedIn: false, user: null, userConfirmed: null };
 
 export default function (state = initialState, action) {
   const { type, payload } = action;
@@ -21,6 +21,8 @@ export default function (state = initialState, action) {
       return {
         ...state,
         isLoggedIn: false,
+        userConfirmed: false,
+        user: payload.user,
       };
     case REGISTER_FAIL:
       return {
@@ -32,6 +34,7 @@ export default function (state = initialState, action) {
         ...state,
         isLoggedIn: true,
         user: payload.user,
+        userConfirmed: true,
       };
     case LOGIN_FAIL:
       return {
@@ -44,6 +47,7 @@ export default function (state = initialState, action) {
         ...state,
         isLoggedIn: false,
         user: null,
+        userConfirmed: null,
       };
     case SET_USER:
       return {

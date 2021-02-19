@@ -7,8 +7,22 @@ const register = async (username, email, password) => {
     password,
     email,
   });
-  console.log(user);
-  await amplifyClient.confirmSignUp(user.username);
+  console.log("register: ", user);
+  return user;
+};
+
+const confirmSignUp = async (username, code) => {
+  const amplifyClient = AmplifyClient();
+  const response = await amplifyClient.confirmSignUp(username, code);
+  console.log("response: ", response);
+  return response;
+};
+
+const resendConfirm = async (username) => {
+  const amplifyClient = AmplifyClient();
+  const response = await amplifyClient.resendSignUp(username);
+  console.log("response: ", response);
+  return response;
 };
 
 const login = async (username, password) => {
@@ -17,6 +31,7 @@ const login = async (username, password) => {
     username,
     password,
   });
+  console.log("login: ", user);
   return user;
 };
 
@@ -44,6 +59,8 @@ const logout = async () => {
 
 export default {
   register,
+  confirmSignUp,
+  resendConfirm,
   login,
   getAccessToken,
   logout,

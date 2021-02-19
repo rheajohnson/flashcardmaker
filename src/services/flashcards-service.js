@@ -2,13 +2,11 @@ import AuthService from "./auth-service";
 import axios from "axios";
 
 const getAllFlashcards = async (id) => {
-  const token = await AuthService.getAccessToken();
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const url = `${baseUrl}/sets/${id}/flashcards`;
   const response = await axios.get(url, {
     headers: {
       "Access-Control-Allow-Origin": "*",
-      Authorization: JSON.parse(token),
     },
   });
   return response.data;
@@ -53,7 +51,6 @@ const updateFlashcard = async (front, back, setId, flashcardId) => {
       },
     }
   );
-  console.log("RESPONSE: ", response);
   return response.data;
 };
 

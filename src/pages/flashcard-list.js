@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Layout, Spin, Input, PageHeader, Button, List } from "antd";
-import FCListModal from "../components/fc-list-modal";
+import { Layout, Input, PageHeader, Button, List } from "antd";
+import FlashcardListModal from "../components/flashcard-list-modal";
 import DeleteConfirm from "../components/delete-confirm";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import Loading from "../components/loading";
 
 import {
   getAllFlashcards,
@@ -12,26 +13,27 @@ import {
   clearAllFlashcards,
   deleteFlashcard,
 } from "../redux/actions/flashcards";
-import { setSet, getAllSets } from "../redux/actions/sets";
+import { setSet, getUserSets } from "../redux/actions/sets";
 
 const { Content } = Layout;
 
-const FCList = ({ match }) => {
+const FlashcardList = ({ match }) => {
   const dispatch = useDispatch();
   const { allFlashcards } = useSelector((state) => state.flashcards);
   const { selectedSet, allSets } = useSelector((state) => state.sets);
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [dataFiltered, setDataFiltered] = useState([]);
+  const history = useHistory();
 
   const [modalEditVisible, setModalEditVisible] = useState(false);
   const [modalEditAction, setModalEditAction] = useState(null);
 
   const sortData = (data) => {
     return data.sort(function (a, b) {
-      if (a.front < b.front) {
+      if (a.front.toLowerCase() < b.front.toLowerCase()) {
         return -1;
       }
-      if (a.front > b.front) {
+      if (a.front.toLowerCase() > b.front.toLowerCase()) {
         return 1;
       }
       return 0;
@@ -39,24 +41,32 @@ const FCList = ({ match }) => {
   };
 
   useEffect(() => {
+    dispatch(clearAllFlashcards());
+  }, []);
+
+  useEffect(() => {
     const id = match.params.id;
     if (!allSets.length) {
-      dispatch(getAllSets());
+      dispatch(getUserSets());
     }
     if (allSets.length) {
-      dispatch(getAllFlashcards(id));
+      dispatch(getAllFlashcards(id)).then(() => setLoading(false));
     }
     const set = allSets.find((set) => set.id === id) || {};
     dispatch(setSet(set));
   }, [allSets]);
 
-  useEffect(() => {
-    dispatch(clearAllFlashcards());
-  }, []);
+  const prevFlashcardsRef = useRef();
 
   useEffect(() => {
     const dataSorted = sortData(allFlashcards);
     setDataFiltered(dataSorted);
+    const prevSets = prevFlashcardsRef.current;
+    if (prevSets !== allFlashcards) {
+      const dataSorted = sortData(allFlashcards);
+      setDataFiltered(dataSorted);
+    }
+    prevFlashcardsRef.current = allFlashcards;
   }, [allFlashcards]);
 
   const onModalEditOpen = (action, id) => {
@@ -71,7 +81,7 @@ const FCList = ({ match }) => {
   const pageHeaderTitle = () => {
     return (
       <>
-        <Link to={"/"}>Flashcard Sets</Link>
+        <Link to={"/"}>Flashcard sets</Link>
         {" > "}
         {selectedSet.name}
       </>
@@ -79,8 +89,8 @@ const FCList = ({ match }) => {
   };
 
   const handleDelete = async (id) => {
-    dispatch(deleteFlashcard(selectedSet.id, id)).then(() =>
-      dispatch(getAllSets())
+    return dispatch(deleteFlashcard(selectedSet.id, id)).then(() =>
+      dispatch(getUserSets(false))
     );
   };
 
@@ -100,7 +110,7 @@ const FCList = ({ match }) => {
 
   return (
     <Layout className="content-layout">
-      <FCListModal
+      <FlashcardListModal
         visible={modalEditVisible}
         setVisible={setModalEditVisible}
         action={modalEditAction}
@@ -124,21 +134,25 @@ const FCList = ({ match }) => {
           >
             New Card
           </Button>,
-          <Button key="1" type="primary">
+          <Button
+            key="1"
+            type="primary"
+            onClick={() => history.push(`/set/${selectedSet.id}/study`)}
+            disabled={!allFlashcards.length}
+          >
             Study
           </Button>,
         ]}
       />
       <Content className="content">
         {loading ? (
-          <div className="spin-container">
-            <Spin />
-          </div>
+          <Loading />
         ) : (
           <List
             itemLayout="horizontal"
             dataSource={dataFiltered}
             className="list"
+            locale={{ emptyText: "No flashcards. Try adding one!" }}
             renderItem={(item) => (
               <List.Item
                 actions={[
@@ -162,4 +176,4 @@ const FCList = ({ match }) => {
   );
 };
 
-export default FCList;
+export default FlashcardList;
