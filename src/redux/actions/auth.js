@@ -1,176 +1,118 @@
 import {
   REGISTER_SUCCESS,
-  REGISTER_FAIL,
   LOGIN_SUCCESS,
-  LOGIN_FAIL,
   LOGOUT,
   SET_MESSAGE,
   SET_USER,
 } from "./types";
 import AuthService from "../../services/auth-service";
 
-export const register = (username, email, password) => (dispatch) => {
-  dispatch({
-    type: SET_MESSAGE,
-    payload: "",
-  });
-  return AuthService.register(username, email, password).then(
-    (data) => {
-      console.log("REGISTER DATA: ", data);
+export const register = (username, email, password) => {
+  return async (dispatch) => {
+    try {
+      dispatch({
+        type: SET_MESSAGE,
+        payload: { message: "", status: "" },
+      });
+      const response = await AuthService.register(username, email, password);
       dispatch({
         type: REGISTER_SUCCESS,
-        payload: { user: { username: data.username } },
+        payload: { user: { username: response.username } },
       });
-      return Promise.resolve();
-    },
-    (error) => {
-      if (error.code === "UsernameExistsException") {
-        return AuthService.login(username, password).then(
-          (data) => {
-            dispatch({
-              type: LOGIN_SUCCESS,
-              payload: { user: { username: data.username } },
-            });
-
-            return Promise.resolve();
-          },
-          (error, username) => {
-            if (error.code === "UserNotConfirmedException") {
-              return dispatch({
-                type: REGISTER_SUCCESS,
-                payload: { user: { username } },
-              });
-            }
-
-            const message =
-              (error.response &&
-                error.response.data &&
-                error.response.data.message) ||
-              error.message ||
-              error.toString();
-
-            dispatch({
-              type: SET_MESSAGE,
-              payload: message,
-            });
-
-            return Promise.reject();
-          }
-        );
+    } catch (err) {
+      if (err.code === "UsernameExistsException") {
+        try {
+          login(username, password);
+        } catch (err) {
+          console.error(err);
+        }
       }
       const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
-
-      dispatch({
-        type: REGISTER_FAIL,
-      });
-
+        (err.response && err.response.data && err.response.data.message) ||
+        err.message ||
+        err.toString();
       dispatch({
         type: SET_MESSAGE,
-        payload: message,
+        payload: { message },
       });
-
-      return Promise.reject();
     }
-  );
+  };
 };
 
-export const confirm = (username, code) => (dispatch) => {
-  dispatch({
-    type: SET_MESSAGE,
-    payload: "",
-  });
-  return AuthService.confirmSignUp(username, code).then(
-    (data) => {
+export const confirm = (username, code) => {
+  return async (dispatch) => {
+    try {
+      dispatch({
+        type: SET_MESSAGE,
+        payload: "",
+      });
+      const response = await AuthService.confirmSignUp(username, code);
       dispatch({
         type: LOGIN_SUCCESS,
-        payload: { username: data.username },
+        payload: { user: { username: response.username } },
       });
-
-      return Promise.resolve();
-    },
-    (error) => {
+    } catch (err) {
       const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
-
-      console.log("ERROR: ", error);
-
+        (err.response && err.response.data && err.response.data.message) ||
+        err.message ||
+        err.toString();
       dispatch({
         type: SET_MESSAGE,
-        payload: message,
+        payload: { message },
       });
-
-      return Promise.reject();
     }
-  );
+  };
 };
 
-export const login = (username, password) => (dispatch) => {
-  dispatch({
-    type: SET_MESSAGE,
-    payload: "",
-  });
-  return AuthService.login(username, password).then(
-    (data) => {
+export const login = (username, password) => {
+  return async (dispatch) => {
+    try {
+      dispatch({
+        type: SET_MESSAGE,
+        payload: { message: "", status: "" },
+      });
+      const response = await AuthService.login(username, password);
       dispatch({
         type: LOGIN_SUCCESS,
-        payload: { user: data.username },
+        payload: { user: { username: response.username } },
       });
-
-      return Promise.resolve();
-    },
-    (error) => {
-      if (error.code === "UserNotConfirmedException") {
+    } catch (err) {
+      if (err.code === "UserNotConfirmedException") {
         return dispatch({
-          type: REGISTER_SUCCESS,
-          payload: { user: { username } },
+          type: SET_USER,
+          payload: {
+            user: { username },
+            isLoggedIn: false,
+            userConfirmed: false,
+          },
         });
       }
       const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
-
-      dispatch({
-        type: LOGIN_FAIL,
-      });
-
+        (err.response && err.response.data && err.response.data.message) ||
+        err.message ||
+        err.toString();
       dispatch({
         type: SET_MESSAGE,
-        payload: message,
+        payload: { message },
       });
-
-      return Promise.reject();
     }
-  );
+  };
 };
 
-export const setUser = (username) => ({
+export const setUser = (user, isLoggedIn, userConfirmed) => ({
   type: SET_USER,
-  payload: { user: username },
+  payload: { user, isLoggedIn, userConfirmed },
 });
 
-export const logout = () => async (dispatch) => {
-  return AuthService.logout().then(
-    () => {
+export const logout = () => {
+  return async (dispatch) => {
+    try {
+      await AuthService.logout();
       dispatch({
         type: LOGOUT,
       });
-      return Promise.resolve();
-    },
-    (error) => {
-      console.error(error);
-      return Promise.reject();
+    } catch (err) {
+      console.error(err);
     }
-  );
+  };
 };

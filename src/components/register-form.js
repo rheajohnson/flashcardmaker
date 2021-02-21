@@ -9,7 +9,7 @@ import { Typography } from "antd";
 
 const { Title, Text, Link: AntLink } = Typography;
 
-import { register, confirm } from "../redux/actions/auth";
+import { register, setUser } from "../redux/actions/auth";
 
 import AuthService from "../services/auth-service";
 
@@ -18,21 +18,25 @@ import { setMessage } from "../redux/actions/message";
 const RegisterForm = () => {
   const [loading, setLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [username, setUsername] = useState("");
 
-  const { isLoggedIn, userConfirmed } = useSelector((state) => state.auth);
-  const { message } = useSelector((state) => state.message);
+  const { isLoggedIn, userConfirmed, user } = useSelector(
+    (state) => state.auth
+  );
+  const { message, messageType } = useSelector((state) => state.message);
 
   const dispatch = useDispatch();
 
   const history = useHistory();
 
   useEffect(() => {
-    if (isLoggedIn) history.push("/");
-    if (userConfirmed === false) setShowConfirm(true);
-  });
+    if (userConfirmed === false) {
+      dispatch(setUser(user, false, null));
+      setShowConfirm(true);
+    }
+  }, [userConfirmed]);
 
   useEffect(() => {
+    if (userConfirmed !== false) setShowConfirm(false);
     dispatch(setMessage(""));
   }, []);
 
@@ -40,40 +44,17 @@ const RegisterForm = () => {
     setLoading(true);
     dispatch(register(username, email, password))
       .then(() => {
-        setUsername(username);
         setLoading(false);
-        setShowConfirm(true);
       })
       .catch(() => {
         setLoading(false);
       });
-  };
-
-  const handleConfirm = ({ code }) => {
-    setLoading(true);
-    dispatch(confirm(username, code))
-      .then(() => {
-        setLoading(false);
-        setShowConfirm(true);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
-  };
-
-  const handleConfirmCodeChange = () => {
-    const codeVal = form.getFieldValue("code");
-    if (codeVal) {
-      const codeParsed = parseInt(codeVal);
-      if (codeParsed) form.setFieldsValue({ code: codeVal });
-      else form.setFieldsValue({ code: "" });
-    }
   };
 
   const resendAuthCode = async () => {
     try {
-      const resendConfirmResponse = await AuthService.resendConfirm(username);
-      console.log(resendConfirmResponse);
+      await AuthService.resendSignUp(user.username);
+      dispatch(setMessage("Verification email sent.", "success"));
     } catch (e) {
       dispatch(setMessage(e.message));
     }
@@ -89,32 +70,26 @@ const RegisterForm = () => {
     <div className="login-form-container">
       {showConfirm ? (
         <>
-          <Title level={2}>Verify your email</Title>
-          <Text>Please enter the code sent to your email address.</Text>
+          <Title level={2}>Please verify your email</Title>
+          <Text>
+            We sent an email confirmation to your email. Please confirm your
+            email before signing in.
+          </Text>
           <Form
             name="normal_login"
             className="login-form"
-            onFinish={handleConfirm}
+            onFinish={() => history.push("/login")}
             form={form}
           >
-            <Form.Item
-              name="code"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your confirmation code",
-                },
-              ]}
-            >
-              <Input
-                placeholder="Confirmation code"
-                maxLength={6}
-                onChange={handleConfirmCodeChange}
-              />
-            </Form.Item>
             {message && (
-              <div className="login-form-error">
-                <Text type="danger"> {message}</Text>
+              <div
+                className={
+                  messageType === "success"
+                    ? "login-form-message"
+                    : "login-form-error"
+                }
+              >
+                <Text type={messageType}>{message}</Text>
               </div>
             )}
             <Form.Item>
@@ -124,12 +99,13 @@ const RegisterForm = () => {
                 className="login-form-button"
                 loading={loading}
               >
-                Verify
+                Continue to sign in
               </Button>
             </Form.Item>
+
             <div className="login-form-alternative-action-container">
               <Text>
-                Didn&apos;t receive code?{" "}
+                Didn&apos;t receive an email?{" "}
                 <AntLink
                   role="button"
                   tabIndex={0}
@@ -159,6 +135,7 @@ const RegisterForm = () => {
               <Input
                 prefix={<UserOutlined className="site-form-item-icon" />}
                 placeholder="Username"
+                autoComplete="on"
               />
             </Form.Item>
             <Form.Item
@@ -168,6 +145,7 @@ const RegisterForm = () => {
               <Input
                 prefix={<MailOutlined className="site-form-item-icon" />}
                 placeholder="Email"
+                autoComplete="on"
               />
             </Form.Item>
             <Form.Item
@@ -176,10 +154,11 @@ const RegisterForm = () => {
                 { required: true, message: "Please input your Password" },
               ]}
             >
-              <Input
+              <Input.Password
                 prefix={<LockOutlined className="site-form-item-icon" />}
                 type="password"
                 placeholder="Password"
+                autoComplete="off"
               />
             </Form.Item>
             {message && (

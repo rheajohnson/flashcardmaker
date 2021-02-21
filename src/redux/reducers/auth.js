@@ -1,8 +1,6 @@
 import {
   REGISTER_SUCCESS,
-  REGISTER_FAIL,
   LOGIN_SUCCESS,
-  LOGIN_FAIL,
   LOGOUT,
   SET_USER,
 } from "../actions/types";
@@ -24,37 +22,28 @@ export default function (state = initialState, action) {
         userConfirmed: false,
         user: payload.user,
       };
-    case REGISTER_FAIL:
-      return {
-        ...state,
-        isLoggedIn: false,
-      };
     case LOGIN_SUCCESS:
       return {
         ...state,
         isLoggedIn: true,
-        user: payload.user,
         userConfirmed: true,
-      };
-    case LOGIN_FAIL:
-      return {
-        ...state,
-        isLoggedIn: false,
-        user: null,
+        user: payload.user,
       };
     case LOGOUT:
       return {
         ...state,
         isLoggedIn: false,
-        user: null,
         userConfirmed: null,
+        user: null,
       };
     case SET_USER:
       return {
         ...state,
-        isLoggedIn: true,
+        isLoggedIn: payload.isLoggedIn,
+        userConfirmed: payload.userConfirmed,
         user: payload.user,
       };
+
     default:
       return state;
   }

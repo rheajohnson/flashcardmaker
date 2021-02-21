@@ -10,45 +10,39 @@ export const clearSet = () => ({
   type: CLEAR_SET,
 });
 
-export const getUserSets = () => (dispatch) => {
-  return SetsService.getUserSets().then(
-    (data) => {
+export const getUserSets = () => {
+  return async (dispatch) => {
+    try {
+      const response = await SetsService.getUserSets();
       dispatch({
         type: SET_ALL_SETS,
-        payload: data,
+        payload: response,
       });
-
-      return Promise.resolve();
-    },
-    (error) => {
-      console.log(error);
-      return Promise.reject();
+    } catch (err) {
+      console.error(err);
     }
-  );
+  };
 };
 
-export const getPublicSets = () => (dispatch) => {
-  return SetsService.getPublicSets().then(
-    (data) => {
+export const getPublicSets = () => {
+  return async (dispatch) => {
+    try {
+      const response = await SetsService.getPublicSets();
       dispatch({
         type: SET_PUBLIC_SETS,
-        payload: data,
+        payload: response,
       });
-
-      return Promise.resolve();
-    },
-    (error) => {
-      console.log(error);
-      return Promise.reject();
+    } catch (err) {
+      console.error(err);
     }
-  );
+  };
 };
 
-export const updateSet = (name, description, id) => (dispatch, getState) => {
-  return SetsService.updateSet(name, description, id).then(
-    () => {
+export const updateSet = (name, description, id) => {
+  return async (dispatch, getState) => {
+    try {
+      await SetsService.updateSet(name, description, id);
       const { allSets } = getState().sets;
-
       const updatedAllSets = allSets.map((set) => {
         if (set.id === id) {
           set.name = name;
@@ -60,39 +54,32 @@ export const updateSet = (name, description, id) => (dispatch, getState) => {
         type: SET_ALL_SETS,
         payload: updatedAllSets,
       });
-
-      return Promise.resolve();
-    },
-    (error) => {
-      console.log(error);
-      return Promise.reject();
+    } catch (err) {
+      console.error(err);
     }
-  );
+  };
 };
 
-export const addSet = (name, description) => (dispatch, getState) => {
-  return SetsService.createSet(name, description).then(
-    (data) => {
+export const addSet = (name, description) => {
+  return async (dispatch, getState) => {
+    try {
+      const response = await SetsService.createSet(name, description);
       const { allSets } = getState().sets;
-
-      const updatedAllSets = [...allSets, data];
+      const updatedAllSets = [...allSets, response];
       dispatch({
         type: SET_ALL_SETS,
         payload: updatedAllSets,
       });
-
-      return Promise.resolve();
-    },
-    (error) => {
-      console.log(error);
-      return Promise.reject();
+    } catch (err) {
+      console.error(err);
     }
-  );
+  };
 };
 
-export const deleteSet = (id) => (dispatch, getState) => {
-  return SetsService.deleteSet(id).then(
-    () => {
+export const deleteSet = (id) => {
+  return async (dispatch, getState) => {
+    try {
+      await SetsService.deleteSet(id);
       const { allSets } = getState().sets;
 
       const updatedAllSets = allSets.filter((set) => set.id !== id);
@@ -100,12 +87,8 @@ export const deleteSet = (id) => (dispatch, getState) => {
         type: SET_ALL_SETS,
         payload: updatedAllSets,
       });
-
-      return Promise.resolve();
-    },
-    (error) => {
-      console.log(error);
-      return Promise.reject();
+    } catch (err) {
+      console.error(err);
     }
-  );
+  };
 };

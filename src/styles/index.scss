@@ -112,6 +112,16 @@ body {
   .ant-typography {
     margin-bottom: 24px;
   }
+  .login-form-message {
+    background-color: rgb(234, 248, 234);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    .ant-typography {
+      margin: 0;
+    }
+  }
   .login-form-error {
     background-color: rgb(255, 226, 226);
     margin-bottom: 12px;
@@ -278,5 +288,14 @@ body {
       margin: 12px;
       min-width: 120px;
     }
+  }
+}
+
+.site-layout-content {
+  min-height: 280px;
+  padding: 24px;
+  background: #fff;
+  input {
+    max-width: 400px;
   }
 }

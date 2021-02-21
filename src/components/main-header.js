@@ -17,6 +17,7 @@ const MainHeader = () => {
   const headerSelectionMap = {
     "/": "1",
     "/login": "2",
+    "/account": "3",
   };
 
   useEffect(() => {
@@ -57,6 +58,15 @@ const MainHeader = () => {
         </Button>
       )}
       <Menu theme="dark" mode="horizontal" selectedKeys={selected}>
+        {isLoggedIn && (
+          <Menu.Item
+            key="3"
+            className="header-item"
+            onClick={() => history.push("/account")}
+          >
+            Account
+          </Menu.Item>
+        )}
         {!isLoggedIn && (
           <Menu.Item
             key="2"

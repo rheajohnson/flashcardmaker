@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect } from "react-router-dom";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import { Form, Input, Button } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
@@ -14,7 +14,7 @@ import { login } from "../redux/actions/auth";
 
 import { setMessage } from "../redux/actions/message";
 
-const LoginForm = (props) => {
+const LoginForm = () => {
   const [loading, setLoading] = useState(false);
 
   const { isLoggedIn, userConfirmed } = useSelector((state) => state.auth);
@@ -22,31 +22,23 @@ const LoginForm = (props) => {
 
   const dispatch = useDispatch();
 
-  const history = useHistory();
-
-  useEffect(() => {
-    if (userConfirmed === false) history.push("/register");
-  });
-
   useEffect(() => {
     dispatch(setMessage(""));
   }, []);
 
   const handleLogin = ({ username, password }) => {
     setLoading(true);
-
-    dispatch(login(username, password))
-      .then(() => {
-        props.history.push("/");
-        window.location.reload();
-      })
-      .catch(() => {
-        setLoading(false);
-      });
+    dispatch(login(username, password)).catch(() => {
+      setLoading(false);
+    });
   };
 
   if (isLoggedIn) {
     return <Redirect to="/" />;
+  }
+
+  if (userConfirmed === false) {
+    return <Redirect to="/register" />;
   }
 
   return (
@@ -59,17 +51,19 @@ const LoginForm = (props) => {
         >
           <Input
             prefix={<UserOutlined className="site-form-item-icon" />}
-            placeholder="Username or email"
+            placeholder="Username"
+            autoComplete="on"
           />
         </Form.Item>
         <Form.Item
           name="password"
           rules={[{ required: true, message: "Please input your Password" }]}
         >
-          <Input
+          <Input.Password
             prefix={<LockOutlined className="site-form-item-icon" />}
             type="password"
             placeholder="Password"
+            autoComplete="on"
           />
         </Form.Item>
 

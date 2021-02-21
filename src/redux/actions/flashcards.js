@@ -15,81 +15,66 @@ export const clearFlashcard = () => ({
   type: CLEAR_FLASHCARD,
 });
 
-export const getAllFlashcards = (id) => (dispatch) => {
-  return flashcardsService.getAllFlashcards(id).then(
-    (data) => {
+export const getAllFlashcards = (id) => {
+  return async (dispatch) => {
+    try {
+      const response = await flashcardsService.getAllFlashcards(id);
       dispatch({
         type: SET_ALL_FLASHCARDS,
-        payload: data,
+        payload: response,
       });
-
-      return Promise.resolve();
-    },
-    (error) => {
-      console.log(error);
-      return Promise.reject();
+    } catch (err) {
+      console.error(err);
     }
-  );
+  };
 };
 
 export const clearAllFlashcards = () => ({
   type: CLEAR_ALL_FLASHCARDS,
 });
 
-export const updateFlashcard = (front, back, setId, flashcardId) => (
-  dispatch,
-  getState
-) => {
-  return flashcardsService
-    .updateFlashcard(front, back, setId, flashcardId)
-    .then(
-      () => {
-        const { allFlashcards } = getState().flashcards;
-
-        const updatedAllFlashcards = allFlashcards.map((flashcard) => {
-          if (flashcard.id === flashcardId) {
-            flashcard.front = front;
-            flashcard.back = back;
-          }
-          return flashcard;
-        });
-        dispatch({
-          type: SET_ALL_FLASHCARDS,
-          payload: updatedAllFlashcards,
-        });
-
-        return Promise.resolve();
-      },
-      (error) => {
-        console.log(error);
-        return Promise.reject();
-      }
-    );
-};
-
-export const addFlashcard = (front, back, id) => (dispatch, getState) => {
-  return flashcardsService.createFlashcard(front, back, id).then(
-    (data) => {
+export const updateFlashcard = (front, back, setId, flashcardId) => {
+  return async (dispatch, getState) => {
+    try {
+      await flashcardsService.updateFlashcard(front, back, setId, flashcardId);
       const { allFlashcards } = getState().flashcards;
-
-      const updatedAllFlashcards = [...allFlashcards, data];
+      const updatedAllFlashcards = allFlashcards.map((flashcard) => {
+        if (flashcard.id === flashcardId) {
+          flashcard.front = front;
+          flashcard.back = back;
+        }
+        return flashcard;
+      });
       dispatch({
         type: SET_ALL_FLASHCARDS,
         payload: updatedAllFlashcards,
       });
-
-      return Promise.resolve();
-    },
-    (error) => {
-      console.log(error);
-      return Promise.reject();
+    } catch (err) {
+      console.error(err);
     }
-  );
+  };
 };
 
-export const deleteFlashcard = (setId, flashcardId) => (dispatch, getState) => {
-  return flashcardsService.deleteFlashcard(setId, flashcardId).then(
-    () => {
+export const addFlashcard = (front, back, id) => {
+  return async (dispatch, getState) => {
+    try {
+      const response = await flashcardsService.createFlashcard(front, back, id);
+      const { allFlashcards } = getState().flashcards;
+      const updatedAllFlashcards = [...allFlashcards, response];
+      dispatch({
+        type: SET_ALL_FLASHCARDS,
+        payload: updatedAllFlashcards,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+};
+
+export const deleteFlashcard = (setId, flashcardId) => {
+  return async (dispatch, getState) => {
+    try {
+      await flashcardsService.deleteFlashcard(setId, flashcardId);
       const { allFlashcards } = getState().flashcards;
 
       const updatedAllFlashcards = allFlashcards.filter(
@@ -99,12 +84,8 @@ export const deleteFlashcard = (setId, flashcardId) => (dispatch, getState) => {
         type: SET_ALL_FLASHCARDS,
         payload: updatedAllFlashcards,
       });
-
-      return Promise.resolve();
-    },
-    (error) => {
-      console.log(error);
-      return Promise.reject();
+    } catch (err) {
+      console.error(err);
     }
-  );
+  };
 };

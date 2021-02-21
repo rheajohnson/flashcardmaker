@@ -15,6 +15,7 @@ const Sets = () => {
   const [setsFiltered, setSetsFiltered] = useState([]);
   const [publicSetsFiltered, setPublicSetsFiltered] = useState([]);
   const { allSets, publicSets } = useSelector((state) => state.sets);
+  const { isLoggedIn } = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();
 
@@ -117,9 +118,8 @@ const Sets = () => {
         <Loading />
       ) : (
         <>
+          {isLoggedIn && renderSets("My sets", setsFiltered, true)}
           {renderSets("Public sets", publicSetsFiltered, false)}
-          {publicSetsFiltered.length > 0 &&
-            renderSets("My sets", setsFiltered, true)}
         </>
       )}
     </Layout>
