@@ -57,7 +57,7 @@ const FlashcardListModal = ({ visible, setVisible, action }) => {
       <Modal
         visible={visible}
         onCancel={handleCancel}
-        title={`${action === "edit" ? "Edit Card" : "New Card"} `}
+        title={`${action === "edit" ? "Edit card" : "New card"} `}
         footer={[
           <Button key="back" onClick={handleCancel}>
             Cancel

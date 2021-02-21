@@ -132,7 +132,7 @@ const FlashcardList = ({ match }) => {
             type="Secondary"
             onClick={() => onModalEditOpen("add")}
           >
-            New Card
+            New card
           </Button>,
           <Button
             key="1"

@@ -73,7 +73,7 @@ const Sets = () => {
     if (renderAction) {
       action.extra = [
         <Button key="1" type="primary" onClick={() => onModalEditOpen("add")}>
-          New Set
+          New set
         </Button>,
       ];
     }

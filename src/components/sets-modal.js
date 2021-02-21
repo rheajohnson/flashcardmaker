@@ -53,7 +53,7 @@ const SetsModal = ({ visible, setVisible, action }) => {
     <>
       <Modal
         visible={visible}
-        title={`${action === "edit" ? "Edit Set" : "New Set"} `}
+        title={`${action === "edit" ? "Edit set" : "New set"} `}
         onCancel={handleCancel}
         footer={[
           <Button key="back" onClick={handleCancel}>

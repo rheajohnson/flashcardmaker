@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Layout, Menu } from "antd";
+import MobileNavButton from "./mobile-nav-button";
+import MobileNavMenu from "./mobile-nav-menu";
 import { Link, useHistory, useLocation } from "react-router-dom";
 import logo from "../assets/logo.svg";
 import { Button } from "antd";
 const { Header } = Layout;
 import { logout } from "../redux/actions/auth";
 
-const MainHeader = () => {
+const MobileHeader = () => {
   const [selected, setSelected] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isLoggedIn } = useSelector((state) => state.auth);
   const history = useHistory();
   const location = useLocation();
@@ -45,7 +48,7 @@ const MainHeader = () => {
           className="header-button"
           onClick={() => onSignOutButtonClick()}
         >
-          Sign Out
+          Sign out
         </Button>
       )}
       {!isLoggedIn && (
@@ -54,10 +57,16 @@ const MainHeader = () => {
           className="header-button"
           onClick={() => history.push("/register")}
         >
-          Sign Up
+          Sign up
         </Button>
       )}
-      <Menu theme="dark" mode="horizontal" selectedKeys={selected}>
+
+      <Menu
+        theme="dark"
+        mode="horizontal"
+        selectedKeys={selected}
+        className="main-nav-menu"
+      >
         {isLoggedIn && (
           <Menu.Item
             key="3"
@@ -73,7 +82,7 @@ const MainHeader = () => {
             className="header-item"
             onClick={() => history.push("/login")}
           >
-            Sign In
+            Sign in
           </Menu.Item>
         )}
         <Menu.Item
@@ -84,8 +93,17 @@ const MainHeader = () => {
           Flashcards
         </Menu.Item>
       </Menu>
+      <MobileNavButton
+        setMobileMenuOpen={setMobileMenuOpen}
+        mobileMenuOpen={mobileMenuOpen}
+      />
+      <MobileNavMenu
+        setMobileMenuOpen={setMobileMenuOpen}
+        mobileMenuOpen={mobileMenuOpen}
+        onSignOutButtonClick={onSignOutButtonClick}
+      />
     </Header>
   );
 };
 
-export default MainHeader;
+export default MobileHeader;
