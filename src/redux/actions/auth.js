@@ -39,31 +39,6 @@ export const register = (username, email, password) => {
   };
 };
 
-export const confirm = (username, code) => {
-  return async (dispatch) => {
-    try {
-      dispatch({
-        type: SET_MESSAGE,
-        payload: "",
-      });
-      const response = await AuthService.confirmSignUp(username, code);
-      dispatch({
-        type: LOGIN_SUCCESS,
-        payload: { user: { username: response.username } },
-      });
-    } catch (err) {
-      const message =
-        (err.response && err.response.data && err.response.data.message) ||
-        err.message ||
-        err.toString();
-      dispatch({
-        type: SET_MESSAGE,
-        payload: { message },
-      });
-    }
-  };
-};
-
 export const login = (username, password) => {
   return async (dispatch) => {
     try {
@@ -71,10 +46,11 @@ export const login = (username, password) => {
         type: SET_MESSAGE,
         payload: { message: "", status: "" },
       });
-      const response = await AuthService.login(username, password);
+      await AuthService.login(username, password);
+      const user = await AuthService.getUser();
       dispatch({
         type: LOGIN_SUCCESS,
-        payload: { user: { username: response.username } },
+        payload: { user },
       });
     } catch (err) {
       if (err.code === "UserNotConfirmedException") {
@@ -99,10 +75,22 @@ export const login = (username, password) => {
   };
 };
 
-export const setUser = (user, isLoggedIn, userConfirmed) => ({
-  type: SET_USER,
-  payload: { user, isLoggedIn, userConfirmed },
-});
+export const setUser = (loggedIn = false, confirmed = null) => {
+  return async (dispatch) => {
+    try {
+      const user = await AuthService.getUser();
+      const isLoggedIn = user ? true : loggedIn;
+      const userConfirmed = user ? true : confirmed;
+
+      dispatch({
+        type: SET_USER,
+        payload: { user, isLoggedIn, userConfirmed },
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+};
 
 export const logout = () => {
   return async (dispatch) => {

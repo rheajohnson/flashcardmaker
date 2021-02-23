@@ -2,6 +2,10 @@
   outline: none !important;
 }
 
+html {
+  font-size: 12px;
+}
+
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
@@ -20,14 +24,15 @@ body {
 }
 
 .content-page-header {
-  padding: 16px 48px;
+  padding: 16px 4rem;
   button {
     min-width: 96px;
   }
 }
 
 .content {
-  padding: 0 48px 16px;
+  padding: 0 4rem 16px;
+  width: 100%;
   overflow: hidden;
 }
 
@@ -54,12 +59,12 @@ body {
   text-align: center;
 }
 
-.fc-card {
+.card {
   width: 280px;
   height: 146px;
   display: flex;
   align-items: center;
-  .fc-card-ellipsis {
+  .card-ellipsis {
     position: absolute;
     top: 0;
     right: 0;
@@ -73,8 +78,7 @@ body {
   }
 }
 
-.fc-card-modal-content {
-  min-width: 64px;
+.card-modal-content {
   text-overflow: ellipsis;
   :hover {
     cursor: pointer;
@@ -176,7 +180,7 @@ body {
 
 .study-header {
   background-color: white;
-  padding: 16px;
+  padding: 0 2rem;
   display: flex;
   justify-content: space-between;
   border-bottom: 2px solid #f0f2f5;
@@ -184,11 +188,10 @@ body {
     width: 120px;
   }
   .study-progress {
-    width: 50%;
+    width: 100%;
     display: flex;
     align-items: center;
     .ant-progress {
-      max-width: 50%;
       margin: 0 12px;
     }
   }
@@ -209,7 +212,7 @@ body {
   align-items: center;
   justify-content: center;
   position: relative;
-  perspective: 1000px; /* Remove this if you don't want the 3D effect */
+  perspective: 1000px;
   background-color: transparent;
 
   .study-content-banner {
@@ -278,10 +281,7 @@ body {
 .flip-card-finished {
   display: flex;
   flex-direction: column;
-  img {
-    margin-bottom: 24px;
-    width: 120px;
-  }
+  padding: 4rem;
   .flip-card-finished-action {
     margin: 24px;
     button {
@@ -315,7 +315,7 @@ body {
 
 .nav-mobile-icon-close {
   position: absolute;
-  right: 48px;
+  right: 4rem;
   width: 40px;
   height: 40px;
   top: 0;
@@ -371,5 +371,32 @@ body {
   }
   .nav-mobile-icon {
     display: block !important;
+  }
+
+  .content {
+    padding: 0 2rem 16px;
+    overflow: hidden;
+    &-page-header {
+      padding: 16px 2rem;
+    }
+  }
+
+  .ant-layout-header {
+    padding: 0 2rem;
+  }
+  .nav-mobile-icon-close {
+    right: 2rem;
+  }
+
+  .nav-mobile-icon {
+    right: 1rem;
+  }
+
+  h1 {
+    font-size: 20px !important;
+  }
+
+  .card {
+    width: calc(100vw - 5.3rem);
   }
 }

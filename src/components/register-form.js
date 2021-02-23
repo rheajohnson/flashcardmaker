@@ -30,7 +30,7 @@ const RegisterForm = () => {
 
   useEffect(() => {
     if (userConfirmed === false) {
-      dispatch(setUser(user, false, null));
+      dispatch(setUser(false, null));
       setShowConfirm(true);
     }
   }, [userConfirmed]);

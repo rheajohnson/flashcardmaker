@@ -8,22 +8,15 @@ import Register from "./pages/register";
 import Study from "./pages/study";
 import Account from "./pages/account";
 import MainHeader from "./components/main-header";
-import AuthService from "./services/auth-service";
 import { setUser } from "./redux/actions/auth";
 
 const App = () => {
   const dispatch = useDispatch();
-
   useEffect(async () => {
     try {
-      const activeSession = await AuthService.getSession();
-      if (activeSession) {
-        dispatch(
-          setUser({ username: activeSession.payload.username }, true, true)
-        );
-      }
-    } catch (e) {
-      console.log("No active user");
+      dispatch(setUser());
+    } catch (err) {
+      console.log(err);
     }
   }, []);
 

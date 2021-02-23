@@ -5,7 +5,7 @@ import {
   CLEAR_ALL_FLASHCARDS,
 } from "../actions/types";
 
-const initialState = { allFlashcards: [], selectedFlashcard: {} };
+const initialState = { allFlashcards: null, selectedFlashcard: null };
 
 export default function (state = initialState, action) {
   const { type, payload } = action;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { PageHeader, Button, Layout, List } from "antd";
+import { PageHeader, Button, Layout, List, Breadcrumb } from "antd";
 import SetsCard from "../components/sets-card";
 import SetsModal from "../components/sets-modal";
 import { getUserSets, getPublicSets, setSet } from "../redux/actions/sets";
@@ -14,37 +14,48 @@ const Sets = () => {
   const [loading, setLoading] = useState(true);
   const [setsFiltered, setSetsFiltered] = useState([]);
   const [publicSetsFiltered, setPublicSetsFiltered] = useState([]);
-  const { allSets, publicSets } = useSelector((state) => state.sets);
-  const { isLoggedIn } = useSelector((state) => state.auth);
+  const { userSets, publicSets } = useSelector((state) => state.sets);
+  const { isLoggedIn, user } = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
     setLoading(true);
-    dispatch(getUserSets());
-    dispatch(getPublicSets()).then(() => setLoading(false));
+    dispatch(getPublicSets());
   }, []);
 
-  const prevSetsRef = useRef();
+  useEffect(() => {
+    if (user && !userSets) {
+      dispatch(getUserSets());
+    }
+  }, [user]);
 
   useEffect(() => {
-    const prevSets = prevSetsRef.current;
-    if (prevSets !== allSets) {
-      const dataSorted = sortData(allSets);
+    const publicSetsLoaded = publicSets && publicSets.length;
+    if (isLoggedIn ? userSets && publicSetsLoaded : publicSetsLoaded)
+      setLoading(false);
+  }, [userSets, publicSets]);
+
+  const prevUserSetsRef = useRef();
+
+  useEffect(() => {
+    const prevUserSets = prevUserSetsRef.current;
+    if (userSets && prevUserSets !== userSets) {
+      const dataSorted = sortData(userSets);
       setSetsFiltered(dataSorted);
     }
-    prevSetsRef.current = allSets;
-  }, [allSets]);
+    prevUserSetsRef.current = userSets;
+  }, [userSets]);
 
   const prevPublicSetsRef = useRef();
 
   useEffect(() => {
-    const prevSets = prevSetsRef.current;
-    if (prevSets !== publicSets) {
+    const prevUserSets = prevUserSetsRef.current;
+    if (publicSets && prevUserSets !== publicSets) {
       const dataSorted = sortData(publicSets);
       setPublicSetsFiltered(dataSorted);
     }
-    prevPublicSetsRef.current = allSets;
+    prevPublicSetsRef.current = userSets;
   }, [publicSets]);
 
   const sortData = (data) => {
@@ -60,15 +71,11 @@ const Sets = () => {
   };
 
   const onModalEditOpen = (action, id) => {
-    if (id) {
-      const set = allSets.find((set) => set.id === id);
-      dispatch(setSet(set));
-    }
+    dispatch(setSet(id)).then(() => setModalEditVisible(true));
     setModalEditAction(action);
-    setModalEditVisible(true);
   };
 
-  const renderSets = (header, sets, renderAction) => {
+  const renderSets = (type, sets, renderAction) => {
     const action = {};
     if (renderAction) {
       action.extra = [
@@ -77,10 +84,19 @@ const Sets = () => {
         </Button>,
       ];
     }
+
+    if (loading) return <Loading />;
+
     return (
       <>
         <PageHeader
-          title={header}
+          title={
+            <Breadcrumb>
+              <Breadcrumb.Item>
+                {type === "public" ? "Public sets" : "My sets"}
+              </Breadcrumb.Item>
+            </Breadcrumb>
+          }
           className="content-page-header"
           {...action}
         />
@@ -96,6 +112,9 @@ const Sets = () => {
                 <List.Item>
                   <SetsCard
                     item={item}
+                    editable={
+                      type === "private" || (user && user.userRole === "admin")
+                    }
                     onCardModalOpen={() => onModalEditOpen("edit", item.id)}
                   />
                 </List.Item>
@@ -114,14 +133,8 @@ const Sets = () => {
         setVisible={setModalEditVisible}
         action={modalEditAction}
       />
-      {loading ? (
-        <Loading />
-      ) : (
-        <>
-          {isLoggedIn && renderSets("My sets", setsFiltered, true)}
-          {renderSets("Public sets", publicSetsFiltered, false)}
-        </>
-      )}
+      {isLoggedIn && renderSets("private", setsFiltered, true)}
+      {renderSets("public", publicSetsFiltered, false)}
     </Layout>
   );
 };

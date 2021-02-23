@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Layout, Input, PageHeader, Button, List } from "antd";
+import { Layout, Input, PageHeader, Button, List, Breadcrumb } from "antd";
 import FlashcardListModal from "../components/flashcard-list-modal";
 import DeleteConfirm from "../components/delete-confirm";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
@@ -10,17 +10,17 @@ import Loading from "../components/loading";
 import {
   getAllFlashcards,
   setFlashcard,
-  clearAllFlashcards,
   deleteFlashcard,
 } from "../redux/actions/flashcards";
-import { setSet, getUserSets } from "../redux/actions/sets";
+import { setSet, getUserSets, getPublicSets } from "../redux/actions/sets";
 
 const { Content } = Layout;
 
 const FlashcardList = ({ match }) => {
   const dispatch = useDispatch();
   const { allFlashcards } = useSelector((state) => state.flashcards);
-  const { selectedSet, allSets } = useSelector((state) => state.sets);
+  const { selectedSet } = useSelector((state) => state.sets);
+  const { user } = useSelector((state) => state.auth);
   const [loading, setLoading] = useState(true);
   const [dataFiltered, setDataFiltered] = useState([]);
   const history = useHistory();
@@ -41,32 +41,27 @@ const FlashcardList = ({ match }) => {
   };
 
   useEffect(() => {
-    dispatch(clearAllFlashcards());
-  }, []);
-
-  useEffect(() => {
     const id = match.params.id;
-    if (!allSets.length) {
-      dispatch(getUserSets());
-    }
-    if (allSets.length) {
-      dispatch(getAllFlashcards(id)).then(() => setLoading(false));
-    }
-    const set = allSets.find((set) => set.id === id) || {};
-    dispatch(setSet(set));
-  }, [allSets]);
+    dispatch(setSet(id)).then(() =>
+      dispatch(getAllFlashcards(id))
+        .then(() => setLoading(false))
+        .catch((err) => console.log(err))
+    );
+  }, []);
 
   const prevFlashcardsRef = useRef();
 
   useEffect(() => {
-    const dataSorted = sortData(allFlashcards);
-    setDataFiltered(dataSorted);
-    const prevSets = prevFlashcardsRef.current;
-    if (prevSets !== allFlashcards) {
+    if (allFlashcards && allFlashcards.length) {
       const dataSorted = sortData(allFlashcards);
       setDataFiltered(dataSorted);
+      const prevSets = prevFlashcardsRef.current;
+      if (prevSets !== allFlashcards) {
+        const dataSorted = sortData(allFlashcards);
+        setDataFiltered(dataSorted);
+      }
+      prevFlashcardsRef.current = allFlashcards;
     }
-    prevFlashcardsRef.current = allFlashcards;
   }, [allFlashcards]);
 
   const onModalEditOpen = (action, id) => {
@@ -80,18 +75,20 @@ const FlashcardList = ({ match }) => {
 
   const pageHeaderTitle = () => {
     return (
-      <>
-        <Link to={"/"}>Flashcard sets</Link>
-        {" > "}
-        {selectedSet.name}
-      </>
+      <Breadcrumb>
+        <Breadcrumb.Item>
+          <Link to={"/"}>Flashcard sets</Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>{selectedSet.name}</Breadcrumb.Item>
+      </Breadcrumb>
     );
   };
 
   const handleDelete = async (id) => {
-    return dispatch(deleteFlashcard(selectedSet.id, id)).then(() =>
-      dispatch(getUserSets(false))
-    );
+    return dispatch(deleteFlashcard(selectedSet.id, id)).then(() => {
+      dispatch(getUserSets());
+      dispatch(getPublicSets());
+    });
   };
 
   const onSearch = (e) => {
@@ -108,6 +105,39 @@ const FlashcardList = ({ match }) => {
     );
   };
 
+  if (!selectedSet) return <Loading />;
+
+  const renderActions = () => {
+    const action = [
+      <Input
+        placeholder="Search..."
+        onInput={(e) => {
+          onSearch(e);
+        }}
+        style={{ width: 200 }}
+        key="3"
+      />,
+      <Button
+        key="1"
+        type="primary"
+        onClick={() => history.push(`/set/${selectedSet.id}/study`)}
+        disabled={!allFlashcards || !allFlashcards.length}
+      >
+        Study
+      </Button>,
+    ];
+    if (user && user.sets.includes(selectedSet.id)) {
+      action.splice(
+        1,
+        0,
+        <Button key="2" type="Secondary" onClick={() => onModalEditOpen("add")}>
+          New card
+        </Button>
+      );
+    }
+    return action;
+  };
+
   return (
     <Layout className="content-layout">
       <FlashcardListModal
@@ -116,33 +146,9 @@ const FlashcardList = ({ match }) => {
         action={modalEditAction}
       />
       <PageHeader
-        title={pageHeaderTitle(name)}
+        title={pageHeaderTitle()}
         className="content-page-header"
-        extra={[
-          <Input
-            placeholder="Search..."
-            onInput={(e) => {
-              onSearch(e);
-            }}
-            style={{ width: 200 }}
-            key="3"
-          />,
-          <Button
-            key="2"
-            type="Secondary"
-            onClick={() => onModalEditOpen("add")}
-          >
-            New card
-          </Button>,
-          <Button
-            key="1"
-            type="primary"
-            onClick={() => history.push(`/set/${selectedSet.id}/study`)}
-            disabled={!allFlashcards.length}
-          >
-            Study
-          </Button>,
-        ]}
+        extra={renderActions()}
       />
       <Content className="content">
         {loading ? (
@@ -155,16 +161,19 @@ const FlashcardList = ({ match }) => {
             locale={{ emptyText: "No flashcards. Try adding one!" }}
             renderItem={(item) => (
               <List.Item
-                actions={[
-                  <EditOutlined
-                    onClick={() => onModalEditOpen("edit", item.id)}
-                    key={item.id}
-                  />,
-                  <DeleteOutlined
-                    onClick={() => DeleteConfirm(item.id, handleDelete)}
-                    key={item.id}
-                  />,
-                ]}
+                actions={
+                  user &&
+                  user.sets.includes(selectedSet.id) && [
+                    <EditOutlined
+                      onClick={() => onModalEditOpen("edit", item.id)}
+                      key={item.id}
+                    />,
+                    <DeleteOutlined
+                      onClick={() => DeleteConfirm(item.id, handleDelete)}
+                      key={item.id}
+                    />,
+                  ]
+                }
               >
                 <List.Item.Meta title={item.front} description={item.back} />
               </List.Item>

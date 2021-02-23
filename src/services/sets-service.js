@@ -16,24 +16,30 @@ const getUserSets = async (userSetIds = []) => {
   return getUserSetsResponse;
 };
 
-const getPublicSets = async () => {
-  const publicSetIds = [];
-  const publicSetsResponse = [];
+const getSet = async (id) => {
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
-  for (const publicSetId of publicSetIds) {
-    const url = `${baseUrl}/sets/${publicSetId}`;
-    const response = await axios.get(url, {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
-    publicSetsResponse.push(response.data);
-  }
-
-  return publicSetsResponse;
+  const url = `${baseUrl}/sets/${id}`;
+  const response = await axios.get(url, {
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
+  return response.data;
 };
 
-const createSet = async (name, description) => {
+const getPublicSets = async () => {
+  const baseUrl = process.env.REACT_APP_API_BASE_URL;
+  const url = `${baseUrl}/sets`;
+  const response = await axios.get(url, {
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
+
+  return response.data;
+};
+
+const createSet = async (name, type) => {
   const token = await AuthService.getAccessToken();
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const url = `${baseUrl}/sets`;
@@ -42,7 +48,7 @@ const createSet = async (name, description) => {
     url,
     {
       name,
-      description,
+      type,
     },
     {
       headers: {
@@ -54,7 +60,7 @@ const createSet = async (name, description) => {
   return response.data;
 };
 
-const updateSet = async (name, description, id) => {
+const updateSet = async (name, item_type, id) => {
   const token = await AuthService.getAccessToken();
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const url = `${baseUrl}/sets/${id}`;
@@ -63,7 +69,7 @@ const updateSet = async (name, description, id) => {
     url,
     {
       name,
-      description,
+      item_type,
     },
     {
       headers: {
@@ -89,4 +95,11 @@ const deleteSet = async (id) => {
   return response.data;
 };
 
-export default { getUserSets, createSet, deleteSet, updateSet, getPublicSets };
+export default {
+  getUserSets,
+  getSet,
+  createSet,
+  deleteSet,
+  updateSet,
+  getPublicSets,
+};

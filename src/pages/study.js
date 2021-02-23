@@ -2,24 +2,27 @@ import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { Button, PageHeader, Progress, Layout, Typography } from "antd";
+import {
+  Button,
+  PageHeader,
+  Progress,
+  Layout,
+  Typography,
+  Breadcrumb,
+} from "antd";
 import Loading from "../components/loading";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 
 const { Content, Header, Footer } = Layout;
 const { Text, Title } = Typography;
-import {
-  getAllFlashcards,
-  clearAllFlashcards,
-} from "../redux/actions/flashcards";
-
-import { getUserSets, setSet } from "../redux/actions/sets";
+import { getAllFlashcards } from "../redux/actions/flashcards";
+import { setSet } from "../redux/actions/sets";
 
 const Sets = ({ match }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [shuffledFlashcards, setShuffledFlashcards] = useState([]);
-  const { selectedSet, allSets } = useSelector((state) => state.sets);
+  const { selectedSet } = useSelector((state) => state.sets);
   const { allFlashcards } = useSelector((state) => state.flashcards);
   const [currentFlashcard, setCurrentFlashcard] = useState({});
   const [cardFlipped, setCardFlipped] = useState(true);
@@ -46,24 +49,14 @@ const Sets = ({ match }) => {
   };
 
   useEffect(() => {
-    setLoading(true);
-    dispatch(clearAllFlashcards());
+    const id = match.params.id;
+    dispatch(setSet(id)).then(() =>
+      dispatch(getAllFlashcards(id)).catch((err) => console.log(err))
+    );
   }, []);
 
-  useEffect(() => {
-    const id = match.params.id;
-    if (!allSets.length) {
-      dispatch(getUserSets());
-    }
-    if (allSets.length) {
-      dispatch(getAllFlashcards(id));
-    }
-    const set = allSets.find((set) => set.id === id) || {};
-    dispatch(setSet(set));
-  }, [allSets]);
-
   useLayoutEffect(() => {
-    if (allFlashcards.length) {
+    if (allFlashcards) {
       setShuffledFlashcards(shuffleFlashcards(allFlashcards));
       setLoading(false);
     }
@@ -71,15 +64,19 @@ const Sets = ({ match }) => {
 
   const renderPageHeaderTitle = () => {
     return (
-      <>
-        <Link to={"/"}>Flashcard sets</Link>
-        {" > "}
-        <Link to={`/set/${selectedSet.id || ""}`}>{`${
-          selectedSet.name || ""
-        }`}</Link>
-        {" > "}
-        Study
-      </>
+      <Breadcrumb>
+        <Breadcrumb.Item>
+          <Link to="/">Flashcard sets</Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Link to={`/set/${(selectedSet && selectedSet.id) || ""}`}>{`${
+            (selectedSet && selectedSet.name) || ""
+          }`}</Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Link to={"/"}>Study</Link>
+        </Breadcrumb.Item>
+      </Breadcrumb>
     );
   };
 
@@ -104,10 +101,7 @@ const Sets = ({ match }) => {
   };
 
   useLayoutEffect(() => {
-    if (
-      allFlashcards.length &&
-      currentFlashcard.index === allFlashcards.length
-    ) {
+    if (allFlashcards && currentFlashcard.index === allFlashcards.length) {
       setFinished(true);
     }
     if (cardTransitioning) {
@@ -148,11 +142,9 @@ const Sets = ({ match }) => {
       );
     return (
       <div className="flip-card-front flip-card-finished">
-        <img
-          alt="celebrate"
-          src="https://media1.giphy.com/media/Wwf1CGft6dW0V97FWe/source.gif"
-        />
-        <Title>{`Great job! You just finished studying ${allFlashcards.length} cards!`}</Title>
+        <Title>{`Great job! You just finished studying ${
+          allFlashcards.length
+        } card${allFlashcards.length > 1 ? "s" : ""}!`}</Title>
         <div className="flip-card-finished-action">
           <Button
             key="1"
@@ -169,10 +161,12 @@ const Sets = ({ match }) => {
     );
   };
 
+  if (!allFlashcards) return <Loading />;
+
   return (
     <Layout className="content-layout">
       <PageHeader
-        title={renderPageHeaderTitle(name)}
+        title={renderPageHeaderTitle()}
         className="content-page-header"
       />
       <Content className="content">

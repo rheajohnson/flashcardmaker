@@ -5,7 +5,7 @@ import {
   SET_PUBLIC_SETS,
 } from "../actions/types";
 
-const initialState = { allSets: [], publicSets: [], selectedSet: {} };
+const initialState = { userSets: null, publicSets: null, selectedSet: null };
 
 export default function (state = initialState, action) {
   const { type, payload } = action;
@@ -13,7 +13,7 @@ export default function (state = initialState, action) {
     case SET_ALL_SETS:
       return {
         ...state,
-        allSets: payload,
+        userSets: payload,
       };
     case SET_PUBLIC_SETS:
       return {

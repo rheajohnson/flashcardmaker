@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Card } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import { Popover } from "antd";
@@ -10,9 +10,8 @@ import { deleteSet, setSet } from "../redux/actions/sets";
 
 const { Meta } = Card;
 
-const SetsCard = ({ item, onCardModalOpen }) => {
+const SetsCard = ({ item, onCardModalOpen, editable }) => {
   const [popOverVisible, setPopoverVisible] = useState(false);
-  const { allSets } = useSelector((state) => state.sets);
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -21,13 +20,11 @@ const SetsCard = ({ item, onCardModalOpen }) => {
   };
 
   const handleSelect = (id) => {
-    const set = allSets.find((set) => set.id === id);
-    dispatch(setSet(set));
-    history.push(`set/${id}`);
+    dispatch(setSet(id)).then(() => history.push(`set/${id}`));
   };
 
   const content = (onCardModalOpen) => (
-    <div className="fc-card-modal-content">
+    <div className="card-modal-content">
       <div
         role="button"
         tabIndex={0}
@@ -61,7 +58,7 @@ const SetsCard = ({ item, onCardModalOpen }) => {
 
   return (
     <Card
-      className="fc-card"
+      className="card"
       hoverable
       onMouseLeave={() => setPopoverVisible(false)}
       onClick={() => {
@@ -71,31 +68,33 @@ const SetsCard = ({ item, onCardModalOpen }) => {
         handleSelect(item.id);
       }}
     >
-      <div className="fc-card-content">
+      <div className="card-content">
         <Meta title={item.name} description={`Total Cards: ${item.count}`} />
       </div>
-      <div
-        className="fc-menu-container"
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.stopPropagation()}
-        role="button"
-        tabIndex={0}
-      >
-        <Popover
-          placement="bottom"
-          content={content(onCardModalOpen)}
-          trigger="click"
-          key={item.id}
-          className="fc-card-popover"
-          visible={popOverVisible}
+      {editable && (
+        <div
+          className="menu-container"
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
+          role="button"
+          tabIndex={0}
         >
-          <EllipsisOutlined
-            onClick={() => setPopoverVisible(!popOverVisible)}
-            className="fc-card-ellipsis"
-            key="ellipsis"
-          />
-        </Popover>
-      </div>
+          <Popover
+            placement="bottom"
+            content={content(onCardModalOpen)}
+            trigger="click"
+            key={item.id}
+            className="card-popover"
+            visible={popOverVisible}
+          >
+            <EllipsisOutlined
+              onClick={() => setPopoverVisible(!popOverVisible)}
+              className="card-ellipsis"
+              key="ellipsis"
+            />
+          </Popover>
+        </div>
+      )}
     </Card>
   );
 };

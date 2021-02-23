@@ -4,7 +4,7 @@ import { Modal, Button } from "antd";
 import { Form, Input } from "antd";
 
 import { updateFlashcard, addFlashcard } from "../redux/actions/flashcards";
-import { getUserSets } from "../redux/actions/sets";
+import { getPublicSets, getUserSets } from "../redux/actions/sets";
 
 const FlashcardListModal = ({ visible, setVisible, action }) => {
   const [loading, setLoading] = useState(false);
@@ -30,6 +30,7 @@ const FlashcardListModal = ({ visible, setVisible, action }) => {
           setVisible(false);
           setLoading(false);
           dispatch(getUserSets());
+          dispatch(getPublicSets());
         });
       }
     } catch (e) {
@@ -74,11 +75,41 @@ const FlashcardListModal = ({ visible, setVisible, action }) => {
         forceRender
       >
         <Form form={form} layout="vertical" onFinish={handleOk}>
-          <Form.Item label="Front" name="front" required>
-            <Input />
+          <Form.Item
+            label="Front"
+            name="front"
+            required
+            rules={[
+              {
+                required: true,
+                message: "Please input a front for this flashcard!",
+              },
+              {
+                min: 3,
+                max: 120,
+                message: "Please input value between 3 and 120 characters.",
+              },
+            ]}
+          >
+            <Input minLength={5} />
           </Form.Item>
-          <Form.Item label="Back" name="back" required>
-            <Input />
+          <Form.Item
+            label="Back"
+            name="back"
+            required
+            rules={[
+              {
+                required: true,
+                message: "Please input a back for this flashcard!",
+              },
+              {
+                min: 3,
+                max: 120,
+                message: "Please input value between 3 and 120 characters.",
+              },
+            ]}
+          >
+            <Input minLength={5} />
           </Form.Item>
         </Form>
       </Modal>
