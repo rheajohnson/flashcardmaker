@@ -9,7 +9,7 @@ import { Typography } from "antd";
 
 const { Title, Text, Link: AntLink } = Typography;
 
-import { register, setUser } from "../redux/actions/auth";
+import { register, getUser } from "../redux/actions/auth";
 
 import AuthService from "../services/auth-service";
 
@@ -30,7 +30,7 @@ const RegisterForm = () => {
 
   useEffect(() => {
     if (userConfirmed === false) {
-      dispatch(setUser(false, null));
+      dispatch(getUser(false, null));
       setShowConfirm(true);
     }
   }, [userConfirmed]);

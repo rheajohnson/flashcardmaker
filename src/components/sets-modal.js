@@ -4,6 +4,7 @@ import { Modal, Button } from "antd";
 import { Form, Input, Switch, Typography } from "antd";
 
 import { updateSet, addSet } from "../redux/actions/sets";
+import { getUser } from "../redux/actions/auth";
 import { clearMessage } from "../redux/actions/message";
 
 const { Text } = Typography;
@@ -28,6 +29,7 @@ const SetsModal = ({ visible, setVisible, action }) => {
       }
       if (action === "add") {
         await dispatch(addSet(name, cardType)).then(() => {
+          dispatch(getUser());
           setVisible(false);
         });
       }
@@ -46,7 +48,6 @@ const SetsModal = ({ visible, setVisible, action }) => {
     if (!visible) {
       form.setFieldsValue({ name: "", type: false });
     } else if (selectedSet && action === "edit") {
-      console.log(selectedSet);
       form.setFieldsValue({
         name: selectedSet.name,
         type: selectedSet.item_type && selectedSet.item_type.includes("public"),
@@ -94,7 +95,7 @@ const SetsModal = ({ visible, setVisible, action }) => {
           >
             <Input minLength={5} />
           </Form.Item>
-          {user && user.userRole === "admin" && (
+          {user && user.userRole === "user" && (
             <Form.Item label="Public" name="type" valuePropName="checked">
               <Switch />
             </Form.Item>

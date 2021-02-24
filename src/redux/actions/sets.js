@@ -1,7 +1,7 @@
 import {
   SET_SET,
-  CLEAR_SET,
-  SET_ALL_SETS,
+  CLEAR_SETS,
+  SET_USER_SETS,
   SET_PUBLIC_SETS,
   SET_MESSAGE,
   CLEAR_MESSAGE,
@@ -9,8 +9,8 @@ import {
 import SetsService from "../../services/sets-service";
 import UserService from "../../services/user-service";
 
-export const clearSet = () => ({
-  type: CLEAR_SET,
+export const clearSets = () => ({
+  type: CLEAR_SETS,
 });
 
 export const setSet = (id) => {
@@ -38,7 +38,7 @@ export const getUserSets = () => {
           userSets.push(await SetsService.getSet(setId));
         }
         dispatch({
-          type: SET_ALL_SETS,
+          type: SET_USER_SETS,
           payload: userSets,
         });
       }
@@ -63,25 +63,15 @@ export const getPublicSets = () => {
 };
 
 export const updateSet = (name, type, id) => {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     try {
       dispatch({
         type: CLEAR_MESSAGE,
       });
       const setType = `type#${type || "private"}#set#${id}`;
       await SetsService.updateSet(name, setType, id);
-      const { userSets } = getState().sets;
-      const updateduserSets = userSets.map((set) => {
-        if (set.id === id) {
-          set.name = name;
-          set.type = type;
-        }
-        return set;
-      });
-      dispatch({
-        type: SET_ALL_SETS,
-        payload: updateduserSets,
-      });
+      dispatch(getPublicSets());
+      dispatch(getUserSets());
     } catch (err) {
       const message =
         (err.response && err.response.data && err.response.data.message) ||
@@ -110,12 +100,8 @@ export const addSet = (name, type) => {
         ...userSetIds,
         createSetResponse.id,
       ]);
-      const { userSets } = getState().sets;
-      const updateduserSets = [...userSets, createSetResponse];
-      dispatch({
-        type: SET_ALL_SETS,
-        payload: updateduserSets,
-      });
+      dispatch(getPublicSets());
+      dispatch(getUserSets());
     } catch (err) {
       const message =
         (err.response && err.response.data && err.response.data.message) ||
@@ -139,12 +125,8 @@ export const deleteSet = (id) => {
       const userSetIds = userDDB.sets;
       const userSetIdsFiltered = userSetIds.filter((setId) => setId !== id);
       await UserService.updateUser(user.sub, userSetIdsFiltered);
-      const { userSets } = getState().sets;
-      const updateduserSets = userSets.filter((set) => set.id !== id);
-      dispatch({
-        type: SET_ALL_SETS,
-        payload: updateduserSets,
-      });
+      dispatch(getPublicSets());
+      dispatch(getUserSets());
     } catch (err) {
       console.error(err);
     }

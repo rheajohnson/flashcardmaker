@@ -5,10 +5,10 @@ import {
   SET_USER,
 } from "../actions/types";
 
-const user = JSON.parse(localStorage.getItem("user"));
+const user = JSON.parse(localStorage.getItem("token"));
 
 const initialState = user
-  ? { isLoggedIn: true, user, userConfirmed: true }
+  ? { isLoggedIn: true, user: null, userConfirmed: true }
   : { isLoggedIn: false, user: null, userConfirmed: null };
 
 export default function (state = initialState, action) {
@@ -39,8 +39,8 @@ export default function (state = initialState, action) {
     case SET_USER:
       return {
         ...state,
-        isLoggedIn: payload.isLoggedIn,
-        userConfirmed: payload.userConfirmed,
+        isLoggedIn: payload.isLoggedIn || state.isLoggedIn,
+        userConfirmed: payload.userConfirmed || state.userConfirmed,
         user: payload.user,
       };
 

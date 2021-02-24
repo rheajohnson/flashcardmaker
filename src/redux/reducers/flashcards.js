@@ -1,8 +1,7 @@
 import {
   SET_ALL_FLASHCARDS,
   SET_FLASHCARD,
-  CLEAR_FLASHCARD,
-  CLEAR_ALL_FLASHCARDS,
+  CLEAR_FLASHCARDS,
 } from "../actions/types";
 
 const initialState = { allFlashcards: null, selectedFlashcard: null };
@@ -20,15 +19,11 @@ export default function (state = initialState, action) {
         ...state,
         selectedFlashcard: payload,
       };
-    case CLEAR_FLASHCARD:
+    case CLEAR_FLASHCARDS:
       return {
         ...state,
-        selectedFlashcard: {},
-      };
-    case CLEAR_ALL_FLASHCARDS:
-      return {
-        ...state,
-        allFlashcards: [],
+        selectedFlashcard: null,
+        allFlashcards: null,
       };
     default:
       return state;

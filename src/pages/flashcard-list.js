@@ -126,7 +126,7 @@ const FlashcardList = ({ match }) => {
         Study
       </Button>,
     ];
-    if (user && user.sets.includes(selectedSet.id)) {
+    if (user && user.sets && user.sets.includes(selectedSet.id)) {
       action.splice(
         1,
         0,
@@ -163,6 +163,7 @@ const FlashcardList = ({ match }) => {
               <List.Item
                 actions={
                   user &&
+                  user.sets &&
                   user.sets.includes(selectedSet.id) && [
                     <EditOutlined
                       onClick={() => onModalEditOpen("edit", item.id)}

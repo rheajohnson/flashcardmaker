@@ -4,6 +4,8 @@ import {
   LOGOUT,
   SET_MESSAGE,
   SET_USER,
+  CLEAR_SETS,
+  CLEAR_FLASHCARDS,
 } from "./types";
 import AuthService from "../../services/auth-service";
 
@@ -75,16 +77,13 @@ export const login = (username, password) => {
   };
 };
 
-export const setUser = (loggedIn = false, confirmed = null) => {
+export const getUser = () => {
   return async (dispatch) => {
     try {
       const user = await AuthService.getUser();
-      const isLoggedIn = user ? true : loggedIn;
-      const userConfirmed = user ? true : confirmed;
-
       dispatch({
         type: SET_USER,
-        payload: { user, isLoggedIn, userConfirmed },
+        payload: { user },
       });
     } catch (err) {
       console.error(err);
@@ -99,6 +98,15 @@ export const logout = () => {
       dispatch({
         type: LOGOUT,
       });
+      dispatch({
+        type: CLEAR_SETS,
+      });
+      dispatch({
+        type: CLEAR_FLASHCARDS,
+      });
+      dispatch(getUser());
+      localStorage.removeItem("token");
+      sessionStorage.clear();
     } catch (err) {
       console.error(err);
     }

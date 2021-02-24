@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useHistory, Redirect } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import {
   Button,
@@ -17,20 +17,41 @@ const { Content, Header, Footer } = Layout;
 const { Text, Title } = Typography;
 import { getAllFlashcards } from "../redux/actions/flashcards";
 import { setSet } from "../redux/actions/sets";
+import SessionService from "../services/session-service";
 
 const Sets = ({ match }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
-  const [shuffledFlashcards, setShuffledFlashcards] = useState([]);
+  const [shuffledFlashcards, setShuffledFlashcards] = useState(null);
+  const [progressIndex, setProgressIndex] = useState(null);
   const { selectedSet } = useSelector((state) => state.sets);
   const { allFlashcards } = useSelector((state) => state.flashcards);
-  const [currentFlashcard, setCurrentFlashcard] = useState({});
+  const [currentFlashcard, setCurrentFlashcard] = useState(null);
   const [cardFlipped, setCardFlipped] = useState(true);
   const [cardTransitioning, setCardTransitioning] = useState(false);
   const [finished, setFinished] = useState(false);
   const history = useHistory();
 
   const cardRef = useRef(null);
+
+  useEffect(() => {
+    if (shuffledFlashcards) {
+      const setId = match.params.id;
+      const orderedFlashcards = shuffledFlashcards.map(
+        (flashcard) => flashcard.id
+      );
+      SessionService.saveFlashcardOrder(setId, orderedFlashcards);
+    }
+  }, [shuffledFlashcards]);
+
+  useEffect(() => {
+    if (progressIndex !== null) {
+      const setId = match.params.id;
+      SessionService.saveFlashcardProgress(setId, progressIndex);
+      setCurrentFlashcard(shuffledFlashcards[progressIndex]);
+      setLoading(false);
+    }
+  }, [progressIndex]);
 
   useEffect(() => {
     focusCard();
@@ -44,21 +65,43 @@ const Sets = ({ match }) => {
 
   const shuffleFlashcards = (flashcards) => {
     const shuffled = flashcards.sort(() => Math.random() - 0.5);
-    setCurrentFlashcard({ ...shuffled[0], index: 0 });
-    return shuffled;
+    setShuffledFlashcards([...shuffled]);
+    console.log("this2");
+    setCurrentFlashcard({ ...shuffled[0] });
+    setProgressIndex(0);
+    setLoading(false);
   };
 
   useEffect(() => {
-    const id = match.params.id;
-    dispatch(setSet(id)).then(() =>
-      dispatch(getAllFlashcards(id)).catch((err) => console.log(err))
+    const setId = match.params.id;
+    dispatch(setSet(setId)).then(() =>
+      dispatch(getAllFlashcards(setId)).catch((err) => console.log(err))
     );
   }, []);
 
-  useLayoutEffect(() => {
+  useEffect(async () => {
     if (allFlashcards) {
-      setShuffledFlashcards(shuffleFlashcards(allFlashcards));
-      setLoading(false);
+      const setId = match.params.id;
+      const cachedFlashcardOrder = await SessionService.getFlashcardOrder(
+        setId
+      );
+      if (
+        cachedFlashcardOrder &&
+        cachedFlashcardOrder.length === allFlashcards.length
+      ) {
+        const flashcardsOrdered = Object.values(
+          cachedFlashcardOrder
+        ).map((id) => allFlashcards.find((flashcard) => flashcard.id === id));
+        setShuffledFlashcards(flashcardsOrdered);
+        const cachedProgressIndex = await SessionService.getFlashcardProgress(
+          setId
+        );
+
+        if (cachedProgressIndex) setProgressIndex(cachedProgressIndex);
+        else setProgressIndex(0);
+      } else {
+        shuffleFlashcards(allFlashcards);
+      }
     }
   }, [allFlashcards]);
 
@@ -81,29 +124,27 @@ const Sets = ({ match }) => {
   };
 
   const navigateCards = async (direction = "next") => {
-    if (currentFlashcard.index === allFlashcards.length) return;
     setCardTransitioning(true);
-    if (
-      direction === "next" &&
-      currentFlashcard.index < shuffledFlashcards.length
-    ) {
+    if (direction === "next" && progressIndex < shuffledFlashcards.length) {
+      if (progressIndex + 1 >= shuffledFlashcards.length) {
+        setCardFlipped(false);
+        setCardTransitioning(false);
+        return setFinished(true);
+      }
       setCurrentFlashcard({
-        ...shuffledFlashcards[currentFlashcard.index + 1],
-        index: currentFlashcard.index + 1,
+        ...shuffledFlashcards[progressIndex + 1],
       });
+      setProgressIndex(progressIndex + 1);
     }
-    if (direction === "prev" && currentFlashcard.index > 0) {
+    if (direction === "prev" && progressIndex > 0) {
       setCurrentFlashcard({
-        ...shuffledFlashcards[currentFlashcard.index - 1],
-        index: currentFlashcard.index - 1,
+        ...shuffledFlashcards[progressIndex - 1],
       });
+      setProgressIndex(progressIndex - 1);
     }
   };
 
   useLayoutEffect(() => {
-    if (allFlashcards && currentFlashcard.index === allFlashcards.length) {
-      setFinished(true);
-    }
     if (cardTransitioning) {
       setCardFlipped(false);
       setCardTransitioning(false);
@@ -161,7 +202,7 @@ const Sets = ({ match }) => {
     );
   };
 
-  if (!allFlashcards) return <Loading />;
+  if (!allFlashcards || !selectedSet) return <Redirect to="/" />;
 
   return (
     <Layout className="content-layout">
@@ -179,12 +220,10 @@ const Sets = ({ match }) => {
                 <div className="study-progress">
                   <Text>Progress</Text>
                   <Progress
-                    percent={
-                      100 * (currentFlashcard.index / allFlashcards.length)
-                    }
+                    percent={100 * ((progressIndex + 1) / allFlashcards.length)}
                     showInfo={false}
                   />
-                  <Text>{`${currentFlashcard.index}/${allFlashcards.length}`}</Text>
+                  <Text>{`${progressIndex + 1}/${allFlashcards.length}`}</Text>
                 </div>
                 <div className="study-header-action">
                   {!finished && (
@@ -239,14 +278,14 @@ const Sets = ({ match }) => {
                     type="secondary"
                     icon={<LeftOutlined />}
                     onClick={() => navigateCards("prev")}
-                    disabled={!currentFlashcard.index}
+                    disabled={!progressIndex}
                   />
                   <Button
                     key="2"
                     type="secondary"
                     icon={<RightOutlined />}
                     onClick={() => navigateCards("next")}
-                    disabled={currentFlashcard.index === allFlashcards.length}
+                    disabled={progressIndex === allFlashcards.length}
                   />
                 </Footer>
               )}

@@ -33,6 +33,7 @@ const getAccessToken = async () => {
   return await amplifyClient.currentSession().then((res) => {
     let accessToken = res.getIdToken();
     let jwt = accessToken.getJwtToken();
+    localStorage.setItem("token", JSON.stringify(jwt));
     return JSON.stringify(jwt);
   });
 };
@@ -60,10 +61,9 @@ const getUser = async () => {
     }
     response.userRole = userDDB.userRole;
     response.sets = userDDB.sets;
-
     return response;
   } catch (err) {
-    return null;
+    return {};
   }
 };
 

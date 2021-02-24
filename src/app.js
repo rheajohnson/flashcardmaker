@@ -8,16 +8,12 @@ import Register from "./pages/register";
 import Study from "./pages/study";
 import Account from "./pages/account";
 import MainHeader from "./components/main-header";
-import { setUser } from "./redux/actions/auth";
+import { getUser } from "./redux/actions/auth";
 
 const App = () => {
   const dispatch = useDispatch();
   useEffect(async () => {
-    try {
-      dispatch(setUser());
-    } catch (err) {
-      console.log(err);
-    }
+    dispatch(getUser());
   }, []);
 
   return (
