@@ -9,6 +9,7 @@
     "lint": "eslint . --ext .js,.jsx --fix"
   },
   "dependencies": {
+    "@aws-amplify/auth": "^3.4.23",
     "antd": "^4.12.2",
     "axios": "^0.21.1",
     "node-sass": "^4.14.1",
