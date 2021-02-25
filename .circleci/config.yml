@@ -130,13 +130,13 @@ workflows:
           filters:
             branches:
               only:
-                - master
+                - main
 
       - eslint:
           filters:
             branches:
               only:
-                - master
+                - main
           requires:
             - npm-ci
 
@@ -145,7 +145,7 @@ workflows:
           filters:
             branches:
               only:
-                - master
+                - main
           name: GetSecrets
           environment-name: "prod"
           requires:
@@ -155,7 +155,7 @@ workflows:
           filters:
             branches:
               only:
-                - master
+                - main
           name: NpmRunBuild
           requires:
             - npm-ci
@@ -166,7 +166,7 @@ workflows:
           filters:
             branches:
               only:
-                - master
+                - main
           name: SyncFilesToS3
           requires:
             - NpmRunBuild
