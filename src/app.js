@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { Route, Switch, HashRouter } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import Sets from "./pages/sets";
 import FlashcardList from "./pages/flashcard-list";
@@ -17,7 +17,7 @@ const App = () => {
   }, []);
 
   return (
-    <Router>
+    <HashRouter>
       <MainHeader />
       <Switch>
         <Route path="/" exact component={Sets} />
@@ -27,7 +27,7 @@ const App = () => {
         <Route path="/set/:id/study" exact component={Study} />
         <Route path="/account" exact component={Account} />
       </Switch>
-    </Router>
+    </HashRouter>
   );
 };
 
