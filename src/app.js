@@ -20,7 +20,7 @@ const App = () => {
     <HashRouter>
       <MainHeader />
       <Switch>
-        <Route path="/" exact component={Sets} />
+        <Route component={Sets} />
         <Route path="/set/:id" exact component={FlashcardList} />
         <Route path="/login" exact component={Login} />
         <Route path="/register" exact component={Register} />
