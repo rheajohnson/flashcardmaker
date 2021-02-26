@@ -28,7 +28,6 @@ const Sets = () => {
 
   const prevUserSetsRef = useRef();
   useEffect(() => {
-    console.log("userSets: ", userSets);
     if (userSets) {
       const prevUserSets = prevUserSetsRef.current;
       if (userSets && prevUserSets !== userSets) {
@@ -41,7 +40,6 @@ const Sets = () => {
 
   const prevPublicSetsRef = useRef();
   useEffect(() => {
-    console.log("publicSets: ", publicSets);
     if (publicSets) {
       const prevUserSets = prevUserSetsRef.current;
       if (publicSets && prevUserSets !== publicSets) {
