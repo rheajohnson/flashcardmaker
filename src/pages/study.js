@@ -176,13 +176,13 @@ const Sets = ({ match }) => {
   const renderFront = () => {
     if (!finished)
       return (
-        <div className="flip-card-front flip-card-front-active">
-          <Title>{`${currentFlashcard.front}`}</Title>
+        <div className="flip-card-term flip-card-term-active">
+          <Title>{`${currentFlashcard.term}`}</Title>
           <div className="study-content-banner">Click the card to flip!</div>
         </div>
       );
     return (
-      <div className="flip-card-front flip-card-finished">
+      <div className="flip-card-term flip-card-finished">
         <Title>{`Great job! You just finished studying ${
           allFlashcards.length
         } card${allFlashcards.length > 1 ? "s" : ""}!`}</Title>
@@ -256,8 +256,8 @@ const Sets = ({ match }) => {
                   >
                     {renderFront()}
 
-                    <div className="flip-card-back">
-                      <Title>{`${currentFlashcard.back}`}</Title>
+                    <div className="flip-card-definition">
+                      <Title>{`${currentFlashcard.definition}`}</Title>
                       <div className="study-content-banner">
                         Click the card to flip!
                       </div>

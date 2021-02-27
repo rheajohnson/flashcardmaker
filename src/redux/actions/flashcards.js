@@ -28,15 +28,20 @@ export const clearAllFlashcards = () => ({
   type: CLEAR_FLASHCARDS,
 });
 
-export const updateFlashcard = (front, back, setId, flashcardId) => {
+export const updateFlashcard = (term, definition, setId, flashcardId) => {
   return async (dispatch, getState) => {
     try {
-      await FlashcardsService.updateFlashcard(front, back, setId, flashcardId);
+      await FlashcardsService.updateFlashcard(
+        term,
+        definition,
+        setId,
+        flashcardId
+      );
       const { allFlashcards } = getState().flashcards;
       const updatedAllFlashcards = allFlashcards.map((flashcard) => {
         if (flashcard.id === flashcardId) {
-          flashcard.front = front;
-          flashcard.back = back;
+          flashcard.term = term;
+          flashcard.definition = definition;
         }
         return flashcard;
       });
@@ -50,10 +55,14 @@ export const updateFlashcard = (front, back, setId, flashcardId) => {
   };
 };
 
-export const addFlashcard = (front, back, id) => {
+export const addFlashcard = (term, definition, id) => {
   return async (dispatch, getState) => {
     try {
-      const response = await FlashcardsService.createFlashcard(front, back, id);
+      const response = await FlashcardsService.createFlashcard(
+        term,
+        definition,
+        id
+      );
       const { allFlashcards } = getState().flashcards;
       const updatedAllFlashcards = [...allFlashcards, response];
       dispatch({

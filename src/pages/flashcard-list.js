@@ -30,10 +30,10 @@ const FlashcardList = ({ match }) => {
 
   const sortData = (data) => {
     return data.sort(function (a, b) {
-      if (a.front.toLowerCase() < b.front.toLowerCase()) {
+      if (a.term.toLowerCase() < b.term.toLowerCase()) {
         return -1;
       }
-      if (a.front.toLowerCase() > b.front.toLowerCase()) {
+      if (a.term.toLowerCase() > b.term.toLowerCase()) {
         return 1;
       }
       return 0;
@@ -96,8 +96,8 @@ const FlashcardList = ({ match }) => {
     setDataFiltered(
       allFlashcards.filter((card) => {
         if (
-          card.front.toLowerCase().includes(val.toLowerCase()) ||
-          card.back.toLowerCase().includes(val.toLowerCase())
+          card.term.toLowerCase().includes(val.toLowerCase()) ||
+          card.definition.toLowerCase().includes(val.toLowerCase())
         ) {
           return card;
         }
@@ -158,7 +158,7 @@ const FlashcardList = ({ match }) => {
             itemLayout="horizontal"
             dataSource={dataFiltered}
             className="list"
-            locale={{ emptyText: "No flashcards. Try adding one!" }}
+            locale={{ emptyText: "No flashcards." }}
             renderItem={(item) => (
               <List.Item
                 actions={
@@ -176,7 +176,10 @@ const FlashcardList = ({ match }) => {
                   ]
                 }
               >
-                <List.Item.Meta title={item.front} description={item.back} />
+                <List.Item.Meta
+                  title={item.term}
+                  description={item.definition}
+                />
               </List.Item>
             )}
           />

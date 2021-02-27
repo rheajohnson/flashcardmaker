@@ -14,19 +14,24 @@ const FlashcardListModal = ({ visible, setVisible, action }) => {
 
   const dispatch = useDispatch();
 
-  const handleOk = async ({ front, back }) => {
+  const handleOk = async ({ term, definition }) => {
     setLoading(true);
     try {
       if (action === "edit") {
         dispatch(
-          updateFlashcard(front, back, selectedSet.id, selectedFlashcard.id)
+          updateFlashcard(
+            term,
+            definition,
+            selectedSet.id,
+            selectedFlashcard.id
+          )
         ).then(() => {
           setVisible(false);
           setLoading(false);
         });
       }
       if (action === "add") {
-        dispatch(addFlashcard(front, back, selectedSet.id)).then(() => {
+        dispatch(addFlashcard(term, definition, selectedSet.id)).then(() => {
           setVisible(false);
           setLoading(false);
           dispatch(getUserSets());
@@ -44,11 +49,11 @@ const FlashcardListModal = ({ visible, setVisible, action }) => {
 
   useEffect(() => {
     if (!visible) {
-      form.setFieldsValue({ front: "", back: "" });
+      form.setFieldsValue({ term: "", definition: "" });
     } else if (selectedFlashcard && action === "edit") {
       form.setFieldsValue({
-        front: selectedFlashcard.front,
-        back: selectedFlashcard.back,
+        term: selectedFlashcard.term,
+        definition: selectedFlashcard.definition,
       });
     }
   }, [visible]);
@@ -60,7 +65,7 @@ const FlashcardListModal = ({ visible, setVisible, action }) => {
         onCancel={handleCancel}
         title={`${action === "edit" ? "Edit card" : "New card"} `}
         footer={[
-          <Button key="back" onClick={handleCancel}>
+          <Button key="definition" onClick={handleCancel}>
             Cancel
           </Button>,
           <Button
@@ -77,12 +82,12 @@ const FlashcardListModal = ({ visible, setVisible, action }) => {
         <Form form={form} layout="vertical" onFinish={handleOk}>
           <Form.Item
             label="Front"
-            name="front"
+            name="term"
             required
             rules={[
               {
                 required: true,
-                message: "Please input a front for this flashcard!",
+                message: "Please input a term for this flashcard!",
               },
               {
                 min: 3,
@@ -95,12 +100,12 @@ const FlashcardListModal = ({ visible, setVisible, action }) => {
           </Form.Item>
           <Form.Item
             label="Back"
-            name="back"
+            name="definition"
             required
             rules={[
               {
                 required: true,
-                message: "Please input a back for this flashcard!",
+                message: "Please input a definition for this flashcard!",
               },
               {
                 min: 3,

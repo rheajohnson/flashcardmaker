@@ -12,7 +12,7 @@ const getAllFlashcards = async (id) => {
   return response.data;
 };
 
-const createFlashcard = async (front, back, id) => {
+const createFlashcard = async (term, definition, id) => {
   const token = await AuthService.getAccessToken();
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const url = `${baseUrl}/sets/${id}/flashcards`;
@@ -20,8 +20,8 @@ const createFlashcard = async (front, back, id) => {
   const response = await axios.post(
     url,
     {
-      front,
-      back,
+      term,
+      definition,
     },
     {
       headers: {
@@ -33,7 +33,7 @@ const createFlashcard = async (front, back, id) => {
   return response.data;
 };
 
-const updateFlashcard = async (front, back, setId, flashcardId) => {
+const updateFlashcard = async (term, definition, setId, flashcardId) => {
   const token = await AuthService.getAccessToken();
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const url = `${baseUrl}/sets/${setId}/flashcards/${flashcardId}`;
@@ -41,8 +41,8 @@ const updateFlashcard = async (front, back, setId, flashcardId) => {
   const response = await axios.put(
     url,
     {
-      front,
-      back,
+      term,
+      definition,
     },
     {
       headers: {

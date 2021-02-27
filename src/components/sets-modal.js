@@ -62,7 +62,7 @@ const SetsModal = ({ visible, setVisible, action }) => {
         title={`${action === "edit" ? "Edit set" : "New set"} `}
         onCancel={handleCancel}
         footer={[
-          <Button key="back" onClick={handleCancel}>
+          <Button key="definition" onClick={handleCancel}>
             Cancel
           </Button>,
           <Button
