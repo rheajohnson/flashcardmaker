@@ -2,18 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useHistory, Redirect } from "react-router-dom";
 
-import { Form, Input, Button } from "antd";
+import { Form, Input, Button, Typography } from "antd";
 import { UserOutlined, LockOutlined, MailOutlined } from "@ant-design/icons";
-
-import { Typography } from "antd";
 
 const { Title, Text, Link: AntLink } = Typography;
 
-import { register, getUser } from "../redux/actions/auth";
+import { register } from "../redux/actions/auth";
 
 import AuthService from "../services/auth-service";
 
 import { setMessage } from "../redux/actions/message";
+import { getUser } from "../redux/actions/auth";
 
 const RegisterForm = () => {
   const [loading, setLoading] = useState(false);
@@ -30,7 +29,6 @@ const RegisterForm = () => {
 
   useEffect(() => {
     if (userConfirmed === false) {
-      dispatch(getUser(false, null));
       setShowConfirm(true);
     }
   }, [userConfirmed]);
@@ -49,6 +47,10 @@ const RegisterForm = () => {
       .catch(() => {
         setLoading(false);
       });
+  };
+
+  const handleContinueToSignIn = () => {
+    dispatch(getUser()).then(() => history.push("/login"));
   };
 
   const resendAuthCode = async () => {
@@ -78,7 +80,7 @@ const RegisterForm = () => {
           <Form
             name="normal_login"
             className="login-form"
-            onFinish={() => history.push("/login")}
+            onFinish={handleContinueToSignIn}
             form={form}
           >
             {message && (

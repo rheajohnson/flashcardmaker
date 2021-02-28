@@ -12,15 +12,11 @@ export const clearFlashcards = () => ({
 
 export const getAllFlashcards = (id) => {
   return async (dispatch) => {
-    try {
-      const response = await FlashcardsService.getAllFlashcards(id);
-      dispatch({
-        type: SET_ALL_FLASHCARDS,
-        payload: response,
-      });
-    } catch (err) {
-      console.error(err);
-    }
+    const response = await FlashcardsService.getAllFlashcards(id);
+    dispatch({
+      type: SET_ALL_FLASHCARDS,
+      payload: response,
+    });
   };
 };
 

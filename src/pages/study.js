@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import { Link, useHistory, Redirect } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import {
   Button,
@@ -27,7 +27,7 @@ const Sets = ({ match }) => {
   const { selectedSet } = useSelector((state) => state.sets);
   const { allFlashcards } = useSelector((state) => state.flashcards);
   const [currentFlashcard, setCurrentFlashcard] = useState(null);
-  const [cardFlipped, setCardFlipped] = useState(true);
+  const [cardFlipped, setCardFlipped] = useState(false);
   const [cardTransitioning, setCardTransitioning] = useState(false);
   const [finished, setFinished] = useState(false);
   const history = useHistory();
@@ -66,23 +66,22 @@ const Sets = ({ match }) => {
   const shuffleFlashcards = (flashcards) => {
     const shuffled = flashcards.sort(() => Math.random() - 0.5);
     setShuffledFlashcards([...shuffled]);
-    console.log("this2");
     setCurrentFlashcard({ ...shuffled[0] });
     setProgressIndex(0);
-    setLoading(false);
   };
 
   useEffect(() => {
     const setId = match.params.id;
-    dispatch(setSet(setId)).then(() =>
-      dispatch(getAllFlashcards(setId)).catch((err) => console.log(err))
-    );
+    dispatch(setSet(setId)).then(() => dispatch(getAllFlashcards(setId)));
   }, []);
 
   useEffect(async () => {
     if (allFlashcards) {
       const setId = match.params.id;
       const cachedFlashcardOrder = await SessionService.getFlashcardOrder(
+        setId
+      );
+      const cachedProgressIndex = await SessionService.getFlashcardProgress(
         setId
       );
       if (
@@ -93,12 +92,11 @@ const Sets = ({ match }) => {
           cachedFlashcardOrder
         ).map((id) => allFlashcards.find((flashcard) => flashcard.id === id));
         setShuffledFlashcards(flashcardsOrdered);
-        const cachedProgressIndex = await SessionService.getFlashcardProgress(
-          setId
+        setProgressIndex(
+          cachedProgressIndex && cachedProgressIndex < allFlashcards.length - 1
+            ? cachedProgressIndex
+            : 0
         );
-
-        if (cachedProgressIndex) setProgressIndex(cachedProgressIndex);
-        else setProgressIndex(0);
       } else {
         shuffleFlashcards(allFlashcards);
       }
@@ -173,17 +171,17 @@ const Sets = ({ match }) => {
     }
   };
 
-  const renderFront = () => {
+  const renderTerm = () => {
     if (!finished)
       return (
         <div className="flip-card-term flip-card-term-active">
-          <Title>{`${currentFlashcard.term}`}</Title>
+          <Title level={4}>{`${currentFlashcard.term}`}</Title>
           <div className="study-content-banner">Click the card to flip!</div>
         </div>
       );
     return (
       <div className="flip-card-term flip-card-finished">
-        <Title>{`Great job! You just finished studying ${
+        <Title level={4}>{`Great job! You just finished studying ${
           allFlashcards.length
         } card${allFlashcards.length > 1 ? "s" : ""}!`}</Title>
         <div className="flip-card-finished-action">
@@ -194,7 +192,7 @@ const Sets = ({ match }) => {
           >
             Start again
           </Button>
-          <Button key="2" type="primary" onClick={() => history.push(`/`)}>
+          <Button key="2" type="primary" onClick={() => history.push("/")}>
             Done for now
           </Button>
         </div>
@@ -202,7 +200,14 @@ const Sets = ({ match }) => {
     );
   };
 
-  if (!allFlashcards || !selectedSet) return <Redirect to="/" />;
+  const renderDefinition = () => {
+    return (
+      <div className="flip-card-definition">
+        <Title level={4}>{`${currentFlashcard.definition}`}</Title>
+        <div className="study-content-banner">Click the card to flip!</div>
+      </div>
+    );
+  };
 
   return (
     <Layout className="content-layout">
@@ -246,7 +251,7 @@ const Sets = ({ match }) => {
                   }`}
                 >
                   <div
-                    className="flip-card-inner "
+                    className="flip-card-inner"
                     onClick={() => flipCard()}
                     onKeyDown={(e) => handleKeyPress(e)}
                     onBlur={() => focusCard()}
@@ -254,14 +259,8 @@ const Sets = ({ match }) => {
                     tabIndex={0}
                     role="button"
                   >
-                    {renderFront()}
-
-                    <div className="flip-card-definition">
-                      <Title>{`${currentFlashcard.definition}`}</Title>
-                      <div className="study-content-banner">
-                        Click the card to flip!
-                      </div>
-                    </div>
+                    {renderTerm()}
+                    {renderDefinition()}
                   </div>
                 </Content>
               )}

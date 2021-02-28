@@ -9,6 +9,7 @@ import Study from "./pages/study";
 import Account from "./pages/account";
 import MainHeader from "./components/main-header";
 import { getUser } from "./redux/actions/auth";
+import ErrorBoundary from "./pages/error-boundary";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -19,15 +20,17 @@ const App = () => {
   return (
     <Router>
       <MainHeader />
-      <Switch>
-        <Route path="/" exact component={Sets} />
-        <Route path="/set/:id" exact component={FlashcardList} />
-        <Route path="/login" exact component={Login} />
-        <Route path="/register" exact component={Register} />
-        <Route path="/set/:id/study" exact component={Study} />
-        <Route path="/account" exact component={Account} />
-        <Route component={Sets} />
-      </Switch>
+      <ErrorBoundary>
+        <Switch>
+          <Route path="/" exact component={Sets} />
+          <Route path="/set/:id" exact component={FlashcardList} />
+          <Route path="/login" exact component={Login} />
+          <Route path="/register" exact component={Register} />
+          <Route path="/set/:id/study" exact component={Study} />
+          <Route path="/account" exact component={Account} />
+          <Route component={Sets} />
+        </Switch>
+      </ErrorBoundary>
     </Router>
   );
 };
