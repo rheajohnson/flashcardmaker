@@ -23,12 +23,11 @@ const App = () => {
       <ErrorBoundary>
         <Switch>
           <Route path="/" exact component={Sets} />
-          <Route path="/:id" exact component={FlashcardList} />
           <Route path="/login" exact component={Login} />
           <Route path="/register" exact component={Register} />
-          <Route path="/:id/study" exact component={Study} />
           <Route path="/account" exact component={Account} />
-          <Route component={Sets} />
+          <Route path="/:id" exact component={FlashcardList} />
+          <Route path="/:id/study" exact component={Study} />
         </Switch>
       </ErrorBoundary>
     </Router>

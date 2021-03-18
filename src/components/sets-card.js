@@ -20,7 +20,7 @@ const SetsCard = ({ item, onCardModalOpen, editable }) => {
   };
 
   const handleSelect = (id) => {
-    dispatch(setSet(id)).then(() => history.push(`set/${id}`));
+    dispatch(setSet(id)).then(() => history.push(`/${id}`));
   };
 
   const content = (onCardModalOpen) => (

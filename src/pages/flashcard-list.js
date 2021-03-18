@@ -42,12 +42,20 @@ const FlashcardList = ({ match }) => {
 
   useEffect(() => {
     const id = match.params.id;
-    dispatch(setSet(id)).then(() =>
-      dispatch(getAllFlashcards(id))
-        .then(() => setLoading(false))
-        .catch((err) => console.log(err))
-    );
+    dispatch(setSet(id)).then(() => dispatch(getAllFlashcards(id)));
   }, []);
+
+  useEffect(() => {
+    if (
+      selectedSet &&
+      Object.keys(selectedSet).length === 0 &&
+      selectedSet.constructor === Object
+    ) {
+      history.push("/");
+    } else if (selectedSet) {
+      setLoading(false);
+    }
+  }, [selectedSet]);
 
   const prevFlashcardsRef = useRef();
 
@@ -120,7 +128,7 @@ const FlashcardList = ({ match }) => {
       <Button
         key="1"
         type="primary"
-        onClick={() => history.push(`/set/${selectedSet.id}/study`)}
+        onClick={() => history.push(`/${selectedSet.id}/study`)}
         disabled={!allFlashcards || !allFlashcards.length}
       >
         Study

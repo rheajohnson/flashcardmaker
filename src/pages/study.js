@@ -63,6 +63,16 @@ const Sets = ({ match }) => {
     }
   };
 
+  useEffect(() => {
+    if (
+      selectedSet &&
+      Object.keys(selectedSet).length === 0 &&
+      selectedSet.constructor === Object
+    ) {
+      history.push("/");
+    }
+  }, [selectedSet]);
+
   const shuffleFlashcards = (flashcards) => {
     const shuffled = flashcards.sort(() => Math.random() - 0.5);
     setShuffledFlashcards([...shuffled]);
@@ -110,7 +120,7 @@ const Sets = ({ match }) => {
           <Link to="/">Flashcard sets</Link>
         </Breadcrumb.Item>
         <Breadcrumb.Item>
-          <Link to={`/set/${(selectedSet && selectedSet.id) || ""}`}>{`${
+          <Link to={`/${(selectedSet && selectedSet.id) || ""}`}>{`${
             (selectedSet && selectedSet.name) || ""
           }`}</Link>
         </Breadcrumb.Item>
