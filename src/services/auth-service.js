@@ -40,21 +40,25 @@ const getAccessToken = async () => {
 
 const getUser = async () => {
   try {
+    const response = {};
+
     const amplifyClient = AmplifyClient();
     const currentUser = await amplifyClient.currentAuthenticatedUser();
-
     const userAttributesResponse = await amplifyClient.userAttributes(
       currentUser
     );
-    const response = {};
+
+    // set cognito user attributes to response
     for (const attribute of userAttributesResponse) {
       response[attribute.Name] = attribute.Value;
     }
     response.username = currentUser.username;
 
+    // get ddb user attributes
     let userDDB = null;
-
     userDDB = await UserService.getUser(response.sub);
+
+    // create user if user not in ddb
     if (!userDDB) {
       const { sub: id, username, email } = response;
       userDDB = await UserService.createUser(id, username, email);

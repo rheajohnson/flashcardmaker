@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Layout } from "antd";
+import { getSets, setSet } from "../redux/actions/sets";
+import { sortSet } from "../helper/sort";
 import SetsContent from "../components/sets-content";
 import SetsModal from "../components/sets-modal";
-import { getUserSets, getPublicSets, setSet } from "../redux/actions/sets";
 import Loading from "../components/loading";
 
 const Sets = () => {
@@ -17,14 +17,18 @@ const Sets = () => {
 
   const dispatch = useDispatch();
 
-  useEffect(async () => {
-    if (user && user.sets && user.sets.length) {
-      await dispatch(getUserSets()).then(() => dispatch(getPublicSets()));
-      setLoading(false);
-    } else if (user) {
-      dispatch(getPublicSets()).then(() => setLoading(false));
+  useEffect(() => {
+    if (user) {
+      dispatch(getSets()).then(() => setLoading(false));
     }
   }, [user]);
+
+  const onModalEditOpen = (action, id) => {
+    dispatch(setSet(id)).then(() => {
+      setModalEditAction(action);
+      setModalEditVisible(true);
+    });
+  };
 
   const prevUserSetsRef = useRef();
   useEffect(() => {
@@ -41,7 +45,7 @@ const Sets = () => {
   const prevPublicSetsRef = useRef();
   useEffect(() => {
     if (publicSets) {
-      const prevUserSets = prevUserSetsRef.current;
+      const prevUserSets = prevPublicSetsRef.current;
       if (publicSets && prevUserSets !== publicSets) {
         const dataSorted = sortSet(publicSets);
         setPublicSetsFiltered(dataSorted);
@@ -50,42 +54,24 @@ const Sets = () => {
     }
   }, [publicSets]);
 
-  const sortSet = (data) => {
-    return data.sort(function (a, b) {
-      if (a.name.toLowerCase() < b.name.toLowerCase()) {
-        return -1;
-      }
-      if (a.name.toLowerCase() > b.name.toLowerCase()) {
-        return 1;
-      }
-      return 0;
-    });
-  };
-
-  const onModalEditOpen = (action, id) => {
-    dispatch(setSet(id)).then(() => setModalEditVisible(true));
-    setModalEditAction(action);
-  };
-
   if (loading) return <Loading />;
 
   return (
-    <Layout className="content-layout">
+    <>
+      {user && userSetsFiltered && (
+        <SetsContent
+          type="private"
+          sets={userSetsFiltered}
+          onModalEditOpen={onModalEditOpen}
+        />
+      )}
+      <SetsContent type="public" sets={publicSetsFiltered} />
       <SetsModal
         visible={modalEditVisible}
         setVisible={setModalEditVisible}
         action={modalEditAction}
       />
-      {user && userSetsFiltered && (
-        <SetsContent
-          type="private"
-          sets={userSetsFiltered}
-          editable
-          onModalEditOpen={onModalEditOpen}
-        />
-      )}
-      <SetsContent type="public" sets={publicSetsFiltered} editable={false} />
-    </Layout>
+    </>
   );
 };
 

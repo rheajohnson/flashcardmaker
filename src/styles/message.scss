@@ -1,0 +1,17 @@
+@import "variables.scss";
+
+.message {
+  margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  padding: 1.2rem;
+  .ant-typography {
+    margin: 0;
+  }
+  &.success {
+    background-color: $success-bg;
+  }
+  &.error {
+    background-color: $error-bg;
+  }
+}

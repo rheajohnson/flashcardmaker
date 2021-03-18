@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input } from "antd";
 import { useSelector } from "react-redux";
-import { Layout, PageHeader, Breadcrumb } from "antd";
 import { Redirect } from "react-router-dom";
+import { Layout, PageHeader, Breadcrumb, Form, Input } from "antd";
+
 import Loading from "../components/loading";
 
 const { Content } = Layout;
@@ -14,27 +14,27 @@ const Account = () => {
 
   useEffect(() => {
     setLoading(false);
-  }, []);
+  });
 
   if (!isLoggedIn) {
     return <Redirect to="/" />;
   }
 
   return (
-    <Layout className="content-layout">
+    <>
       <PageHeader
         title={
           <Breadcrumb>
             <Breadcrumb.Item>Account</Breadcrumb.Item>
           </Breadcrumb>
         }
-        className="content-page-header"
+        className="content-header"
       />
       <Content className="content">
         {loading ? (
           <Loading />
         ) : (
-          <div className="site-layout-content">
+          <div className="account-form-container">
             <Form form={form} layout="vertical">
               <Form.Item label="Username">
                 <Input value={user.username} disabled />
@@ -49,7 +49,7 @@ const Account = () => {
           </div>
         )}
       </Content>
-    </Layout>
+    </>
   );
 };
 

@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
-import { useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { getAllFlashcards } from "../redux/actions/flashcards";
+import { setSet } from "../redux/actions/sets";
+import SessionService from "../services/session-service";
+import Loading from "../components/loading";
+import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import {
   Button,
   PageHeader,
@@ -10,49 +14,25 @@ import {
   Typography,
   Breadcrumb,
 } from "antd";
-import Loading from "../components/loading";
-import { LeftOutlined, RightOutlined } from "@ant-design/icons";
-
 const { Content, Header, Footer } = Layout;
 const { Text, Title } = Typography;
-import { getAllFlashcards } from "../redux/actions/flashcards";
-import { setSet } from "../redux/actions/sets";
-import SessionService from "../services/session-service";
 
 const Sets = ({ match }) => {
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(true);
-  const [shuffledFlashcards, setShuffledFlashcards] = useState(null);
-  const [progressIndex, setProgressIndex] = useState(null);
-  const { selectedSet } = useSelector((state) => state.sets);
-  const { allFlashcards } = useSelector((state) => state.flashcards);
-  const [currentFlashcard, setCurrentFlashcard] = useState(null);
-  const [cardFlipped, setCardFlipped] = useState(false);
-  const [cardTransitioning, setCardTransitioning] = useState(false);
-  const [finished, setFinished] = useState(false);
   const history = useHistory();
 
+  const [loading, setLoading] = useState(true);
+  const [shuffledFlashcards, setShuffledFlashcards] = useState(null);
+  const [currentFlashcard, setCurrentFlashcard] = useState(null);
+  const [cardTransitioning, setCardTransitioning] = useState(false);
+  const [finished, setFinished] = useState(false);
+  const [progressIndex, setProgressIndex] = useState(null);
+  const [cardFlipped, setCardFlipped] = useState(false);
+
+  const { selectedSet } = useSelector((state) => state.sets);
+  const { allFlashcards } = useSelector((state) => state.flashcards);
+
   const cardRef = useRef(null);
-
-  useEffect(() => {
-    if (shuffledFlashcards) {
-      const setId = match.params.id;
-      const orderedFlashcards = shuffledFlashcards.map(
-        (flashcard) => flashcard.id
-      );
-      SessionService.saveFlashcardOrder(setId, orderedFlashcards);
-    }
-  }, [shuffledFlashcards]);
-
-  useEffect(() => {
-    if (progressIndex !== null) {
-      const setId = match.params.id;
-      SessionService.saveFlashcardProgress(setId, progressIndex);
-      setCurrentFlashcard(shuffledFlashcards[progressIndex]);
-      setLoading(false);
-    }
-  }, [progressIndex]);
-
   useEffect(() => {
     focusCard();
   });
@@ -64,28 +44,14 @@ const Sets = ({ match }) => {
   };
 
   useEffect(() => {
-    if (
-      selectedSet &&
-      Object.keys(selectedSet).length === 0 &&
-      selectedSet.constructor === Object
-    ) {
-      history.push("/");
-    }
-  }, [selectedSet]);
-
-  const shuffleFlashcards = (flashcards) => {
-    const shuffled = flashcards.sort(() => Math.random() - 0.5);
-    setShuffledFlashcards([...shuffled]);
-    setCurrentFlashcard({ ...shuffled[0] });
-    setProgressIndex(0);
-  };
-
-  useEffect(() => {
     const setId = match.params.id;
-    dispatch(setSet(setId)).then(() => dispatch(getAllFlashcards(setId)));
+    dispatch(setSet(setId))
+      .then(() => dispatch(getAllFlashcards(setId)))
+      .catch(() => history.push("/"));
   }, []);
 
   useEffect(async () => {
+    if (allFlashcards && !allFlashcards.length) history.push("/");
     if (allFlashcards) {
       const setId = match.params.id;
       const cachedFlashcardOrder = await SessionService.getFlashcardOrder(
@@ -113,25 +79,50 @@ const Sets = ({ match }) => {
     }
   }, [allFlashcards]);
 
-  const renderPageHeaderTitle = () => {
-    return (
-      <Breadcrumb>
-        <Breadcrumb.Item>
-          <Link to="/">Flashcard sets</Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <Link to={`/${(selectedSet && selectedSet.id) || ""}`}>{`${
-            (selectedSet && selectedSet.name) || ""
-          }`}</Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <Link to={"/"}>Study</Link>
-        </Breadcrumb.Item>
-      </Breadcrumb>
-    );
+  useEffect(() => {
+    if (shuffledFlashcards) {
+      const setId = match.params.id;
+      const orderedFlashcards = shuffledFlashcards.map(
+        (flashcard) => flashcard.id
+      );
+      SessionService.saveFlashcardOrder(setId, orderedFlashcards);
+    }
+  }, [shuffledFlashcards]);
+
+  useEffect(() => {
+    if (progressIndex !== null) {
+      const setId = match.params.id;
+      SessionService.saveFlashcardProgress(setId, progressIndex);
+      setCurrentFlashcard(shuffledFlashcards[progressIndex]);
+      setLoading(false);
+    }
+  }, [progressIndex]);
+
+  useLayoutEffect(() => {
+    if (cardTransitioning) {
+      setCardFlipped(false);
+      setCardTransitioning(false);
+    }
+  }, [currentFlashcard]);
+
+  const flipCard = () => {
+    setCardFlipped(!cardFlipped);
   };
 
-  const navigateCards = async (direction = "next") => {
+  const resetCards = () => {
+    setCardTransitioning(true);
+    shuffleFlashcards(allFlashcards);
+    setFinished(false);
+  };
+
+  const shuffleFlashcards = (flashcards) => {
+    const shuffled = flashcards.sort(() => Math.random() - 0.5);
+    setShuffledFlashcards([...shuffled]);
+    setCurrentFlashcard({ ...shuffled[0] });
+    setProgressIndex(0);
+  };
+
+  const navigateCards = async (direction) => {
     setCardTransitioning(true);
     if (direction === "next" && progressIndex < shuffledFlashcards.length) {
       if (progressIndex + 1 >= shuffledFlashcards.length) {
@@ -152,23 +143,6 @@ const Sets = ({ match }) => {
     }
   };
 
-  useLayoutEffect(() => {
-    if (cardTransitioning) {
-      setCardFlipped(false);
-      setCardTransitioning(false);
-    }
-  }, [currentFlashcard]);
-
-  const flipCard = () => {
-    setCardFlipped(!cardFlipped);
-  };
-
-  const resetCards = () => {
-    setCardTransitioning(true);
-    shuffleFlashcards(allFlashcards);
-    setFinished(false);
-  };
-
   const handleKeyPress = (e) => {
     if (e.code === "Space") {
       flipCard();
@@ -179,6 +153,24 @@ const Sets = ({ match }) => {
     if (e.code === "ArrowLeft") {
       navigateCards("prev");
     }
+  };
+
+  const renderPageHeaderTitle = () => {
+    return (
+      <Breadcrumb>
+        <Breadcrumb.Item>
+          <Link to="/">Flashcard sets</Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Link to={`/${(selectedSet && selectedSet.id) || ""}`}>{`${
+            (selectedSet && selectedSet.name) || ""
+          }`}</Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Link to={"/"}>Study</Link>
+        </Breadcrumb.Item>
+      </Breadcrumb>
+    );
   };
 
   const renderTerm = () => {
@@ -220,89 +212,84 @@ const Sets = ({ match }) => {
   };
 
   return (
-    <Layout className="content-layout">
-      <PageHeader
-        title={renderPageHeaderTitle()}
-        className="content-page-header"
-      />
+    <>
+      <PageHeader title={renderPageHeaderTitle()} className="content-header" />
       <Content className="content">
         {loading ? (
           <Loading />
         ) : (
           <Layout className="study-layout">
-            <Layout className="study">
-              <Header className="study-header">
-                <div className="study-progress">
-                  <Text>Progress</Text>
-                  <Progress
-                    percent={100 * ((progressIndex + 1) / allFlashcards.length)}
-                    showInfo={false}
-                  />
-                  <Text>{`${progressIndex + 1}/${allFlashcards.length}`}</Text>
-                </div>
-                <div className="study-header-action">
-                  {!finished && (
-                    <Button
-                      type="secondary"
-                      onClick={() => shuffleFlashcards(allFlashcards)}
-                    >
-                      Shuffle
-                    </Button>
-                  )}
-                </div>
-              </Header>
-              {!cardTransitioning && (
-                <Content
-                  className={`study-content ${
-                    cardFlipped &&
-                    !cardTransitioning &&
-                    !finished &&
-                    "study-content-animated"
-                  }`}
-                >
-                  <div
-                    className="flip-card-inner"
-                    onClick={() => flipCard()}
-                    onKeyDown={(e) => handleKeyPress(e)}
-                    onBlur={() => focusCard()}
-                    ref={cardRef}
-                    tabIndex={0}
-                    role="button"
+            <Header className="study-header">
+              <div className="study-progress">
+                <Text>Progress</Text>
+                <Progress
+                  percent={100 * ((progressIndex + 1) / allFlashcards.length)}
+                  showInfo={false}
+                />
+                <Text>{`${progressIndex + 1}/${allFlashcards.length}`}</Text>
+              </div>
+              <div className="study-header-action">
+                {!finished && (
+                  <Button
+                    type="secondary"
+                    onClick={() => shuffleFlashcards(allFlashcards)}
                   >
-                    {renderTerm()}
-                    {renderDefinition()}
-                  </div>
-                </Content>
-              )}
-              {!finished && (
-                <Footer
-                  className="study-footer"
-                  onClick={(e) => e.stopPropagation()}
-                  role="button"
-                  onKeyDown={(e) => e.stopPropagation()}
+                    Shuffle
+                  </Button>
+                )}
+              </div>
+            </Header>
+            {!cardTransitioning && (
+              <Content
+                className={`study-content ${
+                  cardFlipped &&
+                  !cardTransitioning &&
+                  !finished &&
+                  "study-content-animated"
+                }`}
+              >
+                <div
+                  className="flip-card-inner"
+                  onClick={() => flipCard()}
+                  onKeyDown={(e) => handleKeyPress(e)}
+                  onBlur={() => focusCard()}
+                  ref={cardRef}
                   tabIndex={0}
+                  role="button"
                 >
-                  <Button
-                    key="1"
-                    type="secondary"
-                    icon={<LeftOutlined />}
-                    onClick={() => navigateCards("prev")}
-                    disabled={!progressIndex}
-                  />
-                  <Button
-                    key="2"
-                    type="secondary"
-                    icon={<RightOutlined />}
-                    onClick={() => navigateCards("next")}
-                    disabled={progressIndex === allFlashcards.length}
-                  />
-                </Footer>
-              )}
-            </Layout>
+                  {renderTerm()}
+                  {renderDefinition()}
+                </div>
+              </Content>
+            )}
+            {!finished && (
+              <Footer
+                className="study-footer"
+                onClick={(e) => e.stopPropagation()}
+                role="button"
+                onKeyDown={(e) => e.stopPropagation()}
+                tabIndex={0}
+              >
+                <Button
+                  key="1"
+                  type="secondary"
+                  icon={<LeftOutlined />}
+                  onClick={() => navigateCards("prev")}
+                  disabled={!progressIndex}
+                />
+                <Button
+                  key="2"
+                  type="secondary"
+                  icon={<RightOutlined />}
+                  onClick={() => navigateCards("next")}
+                  disabled={progressIndex === allFlashcards.length}
+                />
+              </Footer>
+            )}
           </Layout>
         )}
       </Content>
-    </Layout>
+    </>
   );
 };
 

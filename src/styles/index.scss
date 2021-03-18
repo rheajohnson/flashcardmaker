@@ -1,3 +1,12 @@
+@import "account.scss";
+@import "card.scss";
+@import "flashcards.scss";
+@import "footer.scss";
+@import "header.scss";
+@import "loading.scss";
+@import "login.scss";
+@import "message.scss";
+@import "study.scss";
 @import "variables.scss";
 
 * {
@@ -12,72 +21,20 @@ body {
   background-color: $off-white;
 }
 
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-}
-
-input[type="number"] {
-  -moz-appearance: textfield;
-}
-
-.list {
-  padding: 0px 1.6rem;
-  background-color: white;
-}
-
 /*
 layout
 */
-Header {
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  width: 100%;
-}
-
-.content-page-header {
+.content-header {
   padding: 1.6rem 4rem;
   button {
     min-width: 9.6rem;
   }
 }
 
-.content-layout:first-of-type {
-  padding-top: 6.4rem;
-}
-
 .content {
   padding: 0 4rem 1.6rem;
   width: 100%;
   overflow: hidden;
-}
-
-.footer {
-  text-align: center;
-}
-
-.spin-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-}
-
-.loading-container {
-  height: calc(100vh - 20rem);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.site-layout-content {
-  min-height: 28rem;
-  padding: 2.4rem;
-  background: #fff;
-  input {
-    max-width: 40rem;
-  }
 }
 
 @media only screen and (max-width: 720px) {

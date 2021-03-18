@@ -19,8 +19,8 @@ const MainHeader = () => {
 
   const headerSelectionMap = {
     "/": "1",
-    "/login": "2",
-    "/account": "3",
+    "/account": "2",
+    "/login": "3",
   };
 
   useEffect(() => {
@@ -56,7 +56,7 @@ const MainHeader = () => {
   };
 
   return (
-    <Header className="header">
+    <Header>
       <Link to="/">
         <img src={logo} alt="Flashcard Maker" className="header-logo" />
       </Link>
@@ -66,19 +66,19 @@ const MainHeader = () => {
         selectedKeys={selected}
         className="header-menu"
       >
+        <Menu.Item key="1" onClick={() => history.push("/")}>
+          Flashcards
+        </Menu.Item>
         {isLoggedIn && (
-          <Menu.Item key="3" onClick={() => history.push("/account")}>
+          <Menu.Item key="2" onClick={() => history.push("/account")}>
             Account
           </Menu.Item>
         )}
         {!isLoggedIn && (
-          <Menu.Item key="2" onClick={() => history.push("/login")}>
+          <Menu.Item key="3" onClick={() => history.push("/login")}>
             Sign in
           </Menu.Item>
         )}
-        <Menu.Item key="1" onClick={() => history.push("/")}>
-          Flashcards
-        </Menu.Item>
       </Menu>
       {renderButton()}
       <MobileNavButton

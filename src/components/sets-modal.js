@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Modal, Button } from "antd";
-import { Form, Input, Switch, Typography } from "antd";
-
+import { Modal, Button, Form, Input, Switch, Typography } from "antd";
 import { updateSet, addSet } from "../redux/actions/sets";
-import { getUser } from "../redux/actions/auth";
 import { clearMessage } from "../redux/actions/message";
 
 const { Text } = Typography;
@@ -19,24 +16,18 @@ const SetsModal = ({ visible, setVisible, action }) => {
 
   const dispatch = useDispatch();
 
-  const handleOk = async ({ name, type }) => {
-    try {
-      const cardType = type ? "public" : "private";
-      if (action === "edit") {
-        await dispatch(updateSet(name, cardType, selectedSet.id)).then(() => {
-          setVisible(false);
-        });
-      }
-      if (action === "add") {
-        await dispatch(addSet(name, cardType)).then(() => {
-          dispatch(getUser());
-          setVisible(false);
-        });
-      }
-      setLoading(false);
-    } catch (err) {
-      setLoading(false);
+  const handleOk = async ({ name, isPublic }) => {
+    const cardType = isPublic ? "public" : "private";
+    setLoading(true);
+    if (action === "edit") {
+      await dispatch(updateSet(name, cardType, selectedSet.id)).then(() =>
+        setVisible(false)
+      );
     }
+    if (action === "add") {
+      await dispatch(addSet(name, cardType)).then(() => setVisible(false));
+    }
+    setLoading(false);
   };
 
   const handleCancel = () => {
@@ -46,11 +37,12 @@ const SetsModal = ({ visible, setVisible, action }) => {
 
   useEffect(() => {
     if (!visible) {
-      form.setFieldsValue({ name: "", type: false });
+      form.setFieldsValue({ name: "", isPublic: false });
     } else if (selectedSet && action === "edit") {
       form.setFieldsValue({
         name: selectedSet.name,
-        type: selectedSet.item_type && selectedSet.item_type.includes("public"),
+        isPublic:
+          selectedSet.item_type && selectedSet.item_type.includes("public"),
       });
     }
   }, [visible]);
@@ -62,12 +54,12 @@ const SetsModal = ({ visible, setVisible, action }) => {
         title={`${action === "edit" ? "Edit set" : "New set"} `}
         onCancel={handleCancel}
         footer={[
-          <Button key="definition" onClick={handleCancel}>
+          <Button key="cancel" onClick={handleCancel}>
             Cancel
           </Button>,
           <Button
-            key="submit"
             type="primary"
+            key="submit"
             loading={loading}
             onClick={form.submit}
           >
@@ -95,13 +87,13 @@ const SetsModal = ({ visible, setVisible, action }) => {
           >
             <Input minLength={5} />
           </Form.Item>
-          {user && user.userRole === "user" && (
-            <Form.Item label="Public" name="type" valuePropName="checked">
+          {user && user.userRole === "admin" && (
+            <Form.Item label="Public" name="isPublic" valuePropName="checked">
               <Switch />
             </Form.Item>
           )}
           {message && (
-            <div className="login-form-error">
+            <div className="message-error">
               <Text type="danger"> {message}</Text>
             </div>
           )}

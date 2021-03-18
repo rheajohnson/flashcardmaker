@@ -15,25 +15,22 @@ export const clearSets = () => ({
 
 export const setSet = (id) => {
   return async (dispatch) => {
-    try {
-      const getSetResponse = await SetsService.getSet(id);
-      dispatch({
-        type: SET_SET,
-        payload: getSetResponse,
-      });
-    } catch (err) {
-      console.error(err);
-    }
+    const getSetResponse = await SetsService.getSet(id);
+    dispatch({
+      type: SET_SET,
+      payload: getSetResponse,
+    });
   };
 };
 
-export const getUserSets = () => {
+export const getSets = () => {
   return async (dispatch, getState) => {
     try {
       const { user } = await getState().auth;
-      if (user) {
+      if (user && user.sub) {
         const userDDB = await UserService.getUser(user.sub);
         const userSets = [];
+        // get user sets from set ids in user obj
         for (const setId of userDDB.sets) {
           userSets.push(await SetsService.getSet(setId));
         }
@@ -42,19 +39,10 @@ export const getUserSets = () => {
           payload: userSets,
         });
       }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-};
-
-export const getPublicSets = () => {
-  return async (dispatch) => {
-    try {
-      const response = await SetsService.getPublicSets();
+      const getPublicSetsResponse = await SetsService.getPublicSets();
       dispatch({
         type: SET_PUBLIC_SETS,
-        payload: response,
+        payload: getPublicSetsResponse,
       });
     } catch (err) {
       console.error(err);
@@ -70,8 +58,7 @@ export const updateSet = (name, type, id) => {
       });
       const setType = `type#${type || "private"}#set#${id}`;
       await SetsService.updateSet(name, setType, id);
-      dispatch(getPublicSets());
-      dispatch(getUserSets());
+      await dispatch(getSets());
     } catch (err) {
       const message =
         (err.response && err.response.data && err.response.data.message) ||
@@ -81,7 +68,6 @@ export const updateSet = (name, type, id) => {
         type: SET_MESSAGE,
         payload: { message },
       });
-      throw new Error(err);
     }
   };
 };
@@ -100,8 +86,7 @@ export const addSet = (name, type) => {
         ...userSetIds,
         createSetResponse.id,
       ]);
-      dispatch(getPublicSets());
-      dispatch(getUserSets());
+      await dispatch(getSets());
     } catch (err) {
       const message =
         (err.response && err.response.data && err.response.data.message) ||
@@ -111,7 +96,6 @@ export const addSet = (name, type) => {
         type: SET_MESSAGE,
         payload: { message },
       });
-      throw new Error(err);
     }
   };
 };
@@ -125,8 +109,7 @@ export const deleteSet = (id) => {
       const userSetIds = userDDB.sets;
       const userSetIdsFiltered = userSetIds.filter((setId) => setId !== id);
       await UserService.updateUser(user.sub, userSetIdsFiltered);
-      dispatch(getPublicSets());
-      dispatch(getUserSets());
+      await dispatch(getSets());
     } catch (err) {
       console.error(err);
     }

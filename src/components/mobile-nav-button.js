@@ -1,5 +1,6 @@
 import React from "react";
 import { MenuOutlined } from "@ant-design/icons";
+
 export default function MobileNav({ setMobileMenuOpen, mobileMenuOpen }) {
   return (
     <div
@@ -7,7 +8,7 @@ export default function MobileNav({ setMobileMenuOpen, mobileMenuOpen }) {
       onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
       onKeyDown={() => setMobileMenuOpen(!mobileMenuOpen)}
       tabIndex={0}
-      className="nav-mobile-icon"
+      className="mobile-nav-icon-open"
     >
       <MenuOutlined />
     </div>

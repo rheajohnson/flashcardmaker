@@ -24,7 +24,8 @@ const getSet = async (id) => {
       "Access-Control-Allow-Origin": "*",
     },
   });
-  return response.data || {};
+  if (!response.data) throw new Error("Set not found.");
+  return response.data;
 };
 
 const getPublicSets = async () => {

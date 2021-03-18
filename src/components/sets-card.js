@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Card } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import { Popover } from "antd";
@@ -10,10 +10,15 @@ import { deleteSet, setSet } from "../redux/actions/sets";
 
 const { Meta } = Card;
 
-const SetsCard = ({ item, onCardModalOpen, editable }) => {
+const SetsCard = ({ item, onCardModalOpen }) => {
   const [popOverVisible, setPopoverVisible] = useState(false);
+  const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const history = useHistory();
+
+  const editable =
+    (user && user.sets && user.sets.includes(item.id)) ||
+    (user && user.userRole && user.userRole === "admin");
 
   const handleDelete = (id) => {
     return dispatch(deleteSet(id));

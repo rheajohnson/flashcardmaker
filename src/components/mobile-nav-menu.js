@@ -12,35 +12,17 @@ export default function MobileNavMenu({
   const history = useHistory();
 
   return (
-    <div className={`menu-transition ${mobileMenuOpen ? "open" : ""}`}>
-      <ul className="nav-mobile-menu">
+    <div className={`mobile-nav-container ${mobileMenuOpen ? "open" : ""}`}>
+      <ul className="mobile-nav">
         <div
           role="button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           onKeyDown={() => setMobileMenuOpen(!mobileMenuOpen)}
           tabIndex={0}
-          className="nav-mobile-icon-close"
+          className="mobile-nav-icon-close"
         >
           <CloseOutlined />
         </div>
-        {isLoggedIn && (
-          <li>
-            <div
-              onClick={() => {
-                history.push("/account");
-                setMobileMenuOpen(false);
-              }}
-              onKeyDown={() => {
-                history.push("/account");
-                setMobileMenuOpen(false);
-              }}
-              role="button"
-              tabIndex={0}
-            >
-              Account
-            </div>
-          </li>
-        )}
         <li>
           <div
             onClick={() => {
@@ -58,58 +40,76 @@ export default function MobileNavMenu({
           </div>
         </li>
         {!isLoggedIn && (
-          <li>
-            <div
-              onClick={() => {
-                history.push("/login");
-                setMobileMenuOpen(false);
-              }}
-              onKeyDown={() => {
-                history.push("/login");
-                setMobileMenuOpen(false);
-              }}
-              role="button"
-              tabIndex={0}
-            >
-              Sign in
-            </div>
-          </li>
-        )}
-        {!isLoggedIn && (
-          <li>
-            <div
-              onClick={() => {
-                history.push("/register");
-                setMobileMenuOpen(false);
-              }}
-              onKeyDown={() => {
-                history.push("/register");
-                setMobileMenuOpen(false);
-              }}
-              role="button"
-              tabIndex={0}
-            >
-              Sign up
-            </div>
-          </li>
+          <>
+            <li>
+              <div
+                onClick={() => {
+                  history.push("/login");
+                  setMobileMenuOpen(false);
+                }}
+                onKeyDown={() => {
+                  history.push("/login");
+                  setMobileMenuOpen(false);
+                }}
+                role="button"
+                tabIndex={0}
+              >
+                Sign in
+              </div>
+            </li>
+            <li>
+              <div
+                onClick={() => {
+                  history.push("/register");
+                  setMobileMenuOpen(false);
+                }}
+                onKeyDown={() => {
+                  history.push("/register");
+                  setMobileMenuOpen(false);
+                }}
+                role="button"
+                tabIndex={0}
+              >
+                Sign up
+              </div>
+            </li>
+          </>
         )}
         {isLoggedIn && (
-          <li>
-            <div
-              onClick={() => {
-                onSignOutButtonClick();
-                setMobileMenuOpen(false);
-              }}
-              onKeyDown={() => {
-                onSignOutButtonClick();
-                setMobileMenuOpen(false);
-              }}
-              role="button"
-              tabIndex={0}
-            >
-              Sign out
-            </div>
-          </li>
+          <>
+            <li>
+              <div
+                onClick={() => {
+                  history.push("/account");
+                  setMobileMenuOpen(false);
+                }}
+                onKeyDown={() => {
+                  history.push("/account");
+                  setMobileMenuOpen(false);
+                }}
+                role="button"
+                tabIndex={0}
+              >
+                Account
+              </div>
+            </li>
+            <li>
+              <div
+                onClick={() => {
+                  onSignOutButtonClick();
+                  setMobileMenuOpen(false);
+                }}
+                onKeyDown={() => {
+                  onSignOutButtonClick();
+                  setMobileMenuOpen(false);
+                }}
+                role="button"
+                tabIndex={0}
+              >
+                Sign out
+              </div>
+            </li>
+          </>
         )}
       </ul>
     </div>

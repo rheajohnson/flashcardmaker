@@ -1,6 +1,6 @@
 @import "variables.scss";
 
-.login-container {
+.login-content {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -20,31 +20,10 @@
   .login-form-button {
     width: 100%;
   }
-
   .ant-typography {
     margin-bottom: 2.4rem;
   }
-  .login-form-message {
-    background-color: $error-bg;
-    margin-bottom: 1.2rem;
-    display: flex;
-    align-items: center;
-    padding: 1.2rem;
-    .ant-typography {
-      margin: 0;
-    }
-  }
-  .login-form-error {
-    background-color: $success-bg;
-    margin-bottom: 1.2rem;
-    display: flex;
-    align-items: center;
-    padding: 1.2rem;
-    .ant-typography {
-      margin: 0;
-    }
-  }
-  .login-form-alternative-action-container {
+  .login-form-action-aside {
     display: flex;
     justify-content: center;
   }

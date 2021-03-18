@@ -65,10 +65,12 @@ export const login = (username, password) => {
           },
         });
       }
+
       const message =
         (err.response && err.response.data && err.response.data.message) ||
         err.message ||
         err.toString();
+
       dispatch({
         type: SET_MESSAGE,
         payload: { message },
@@ -81,9 +83,14 @@ export const getUser = () => {
   return async (dispatch) => {
     try {
       const user = await AuthService.getUser();
+      const userSignedIn = !!user.sub;
       dispatch({
         type: SET_USER,
-        payload: { user },
+        payload: {
+          user: user,
+          isLoggedIn: userSignedIn,
+          userConfirmed: userSignedIn || null,
+        },
       });
     } catch (err) {
       console.error(err);

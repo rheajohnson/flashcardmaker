@@ -1,8 +1,12 @@
 @import "variables.scss";
 
-.header {
+header {
   display: flex;
   align-items: center;
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  width: 100%;
   .header-logo {
     width: 20rem;
   }
@@ -19,6 +23,10 @@
 /*
 ant style override
 */
+.ant-layout-header {
+  padding: 0 4rem;
+}
+
 .ant-menu-item {
   background-color: transparent !important;
   border-bottom: 3px solid transparent !important;
@@ -33,25 +41,12 @@ ant style override
 /*
 mobile nav
 */
-.nav-mobile-icon {
+.mobile-nav-icon-open {
   display: none;
   position: absolute;
-  right: 4rem;
-  width: 4rem;
-  height: 4rem;
-  font-size: 2.4rem;
-  color: white;
-  &:hover {
-    cursor: pointer;
-  }
-}
-
-.nav-mobile-icon-close {
-  position: absolute;
-  right: 4rem;
-  width: 4rem;
-  height: 4rem;
   top: 0;
+  width: 4rem;
+  height: 4rem;
   font-size: 2.4rem;
   color: white;
   &:hover {
@@ -59,25 +54,7 @@ mobile nav
   }
 }
 
-.nav-mobile-menu {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.4rem;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  li {
-    list-style: none;
-    &:hover {
-      cursor: pointer;
-    }
-  }
-}
-
-.menu-transition {
+.mobile-nav-container {
   position: fixed;
   height: 100%;
   width: 100%;
@@ -97,25 +74,52 @@ mobile nav
   }
 }
 
+.mobile-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.4rem;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  li {
+    list-style: none;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+  .mobile-nav-icon-close {
+    position: absolute;
+    top: 0;
+    right: 2rem;
+    width: 4rem;
+    height: 4rem;
+    font-size: 2.4rem;
+    color: white;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
 @media only screen and (max-width: 720px) {
   .header-menu,
   .header-button {
     display: none;
   }
 
-  .nav-mobile-icon {
+  .mobile-nav-icon-open {
     display: block !important;
+    right: 1rem;
   }
 
   .ant-layout-header {
     padding: 0 2rem;
   }
 
-  .nav-mobile-icon-close {
+  .mobile-nav-icon-close {
     right: 2rem;
-  }
-
-  .nav-mobile-icon {
-    right: 1rem;
   }
 }

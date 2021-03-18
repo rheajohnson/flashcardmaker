@@ -4,7 +4,7 @@ import { Modal, Button } from "antd";
 import { Form, Input } from "antd";
 
 import { updateFlashcard, addFlashcard } from "../redux/actions/flashcards";
-import { getPublicSets, getUserSets } from "../redux/actions/sets";
+import { getSets } from "../redux/actions/sets";
 
 const FlashcardListModal = ({ visible, setVisible, action }) => {
   const [loading, setLoading] = useState(false);
@@ -34,8 +34,7 @@ const FlashcardListModal = ({ visible, setVisible, action }) => {
         dispatch(addFlashcard(term, definition, selectedSet.id)).then(() => {
           setVisible(false);
           setLoading(false);
-          dispatch(getUserSets());
-          dispatch(getPublicSets());
+          dispatch(getSets());
         });
       }
     } catch (e) {

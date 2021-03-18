@@ -1,15 +1,17 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { useDispatch } from "react-redux";
+
 import Sets from "./pages/sets";
-import FlashcardList from "./pages/flashcard-list";
+import Flashcards from "./pages/flashcards";
 import Login from "./pages/login";
 import Register from "./pages/register";
 import Study from "./pages/study";
 import Account from "./pages/account";
 import MainHeader from "./components/main-header";
+import ErrorBoundary from "./components/error-boundary";
+
+import { useDispatch } from "react-redux";
 import { getUser } from "./redux/actions/auth";
-import ErrorBoundary from "./pages/error-boundary";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -22,12 +24,12 @@ const App = () => {
       <MainHeader />
       <ErrorBoundary>
         <Switch>
-          <Route path="/" exact component={Sets} />
           <Route path="/login" exact component={Login} />
           <Route path="/register" exact component={Register} />
           <Route path="/account" exact component={Account} />
-          <Route path="/:id" exact component={FlashcardList} />
+          <Route path="/:id" exact component={Flashcards} />
           <Route path="/:id/study" exact component={Study} />
+          <Route path="/" component={Sets} />
         </Switch>
       </ErrorBoundary>
     </Router>

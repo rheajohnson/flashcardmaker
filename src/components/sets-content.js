@@ -8,16 +8,14 @@ const { Content } = Layout;
 const SetsContent = ({ type, sets, editable, onModalEditOpen }) => {
   const { user } = useSelector((state) => state.auth);
 
-  const renderActions = () => {
-    const action = [];
-    if (editable) {
-      action.push(
-        <Button key="1" type="primary" onClick={() => onModalEditOpen("add")}>
-          New set
-        </Button>
-      );
-    }
-    return action;
+  const getActions = () => {
+    return editable
+      ? [
+          <Button key="1" type="primary" onClick={() => onModalEditOpen("add")}>
+            New set
+          </Button>,
+        ]
+      : [];
   };
 
   return (
@@ -30,8 +28,8 @@ const SetsContent = ({ type, sets, editable, onModalEditOpen }) => {
             </Breadcrumb.Item>
           </Breadcrumb>
         }
-        className="content-page-header"
-        extra={renderActions()}
+        className="content-header"
+        extra={getActions()}
       />
       <Content className="content">
         <div className="site-card-wrapper">
@@ -40,7 +38,7 @@ const SetsContent = ({ type, sets, editable, onModalEditOpen }) => {
               gutter: 16,
             }}
             locale={{ emptyText: "No flashcard sets" }}
-            dataSource={sets}
+            dataSource={sets || []}
             renderItem={(item) => (
               <List.Item>
                 <SetsCard

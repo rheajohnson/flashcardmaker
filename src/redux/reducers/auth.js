@@ -39,14 +39,8 @@ export default function (state = initialState, action) {
     case SET_USER:
       return {
         ...state,
-        isLoggedIn:
-          payload.isLoggedIn !== "undefined"
-            ? payload.isLoggedIn
-            : state.isLoggedIn,
-        userConfirmed:
-          payload.userConfirmed !== "undefined"
-            ? payload.userConfirmed
-            : state.userConfirmed,
+        isLoggedIn: payload.isLoggedIn,
+        userConfirmed: payload.userConfirmed,
         user: payload.user,
       };
 

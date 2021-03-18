@@ -1,19 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useHistory } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { Layout, Input, PageHeader, Button, List, Breadcrumb } from "antd";
-import FlashcardListModal from "../components/flashcard-list-modal";
-import DeleteConfirm from "../components/delete-confirm";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import Loading from "../components/loading";
 
+import { useDispatch, useSelector } from "react-redux";
+import { setSet, getSets } from "../redux/actions/sets";
+
+import FlashcardsModal from "../components/flashcards-modal";
+import DeleteConfirm from "../components/delete-confirm";
+import Loading from "../components/loading";
+import { sortFlashcardList } from "../helper/sort";
+
+import { Layout, Input, PageHeader, Button, List, Breadcrumb } from "antd";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
   getAllFlashcards,
   setFlashcard,
   deleteFlashcard,
 } from "../redux/actions/flashcards";
-import { setSet, getUserSets, getPublicSets } from "../redux/actions/sets";
-
 const { Content } = Layout;
 
 const FlashcardList = ({ match }) => {
@@ -22,51 +24,29 @@ const FlashcardList = ({ match }) => {
   const { selectedSet } = useSelector((state) => state.sets);
   const { user } = useSelector((state) => state.auth);
   const [loading, setLoading] = useState(true);
-  const [dataFiltered, setDataFiltered] = useState([]);
+  const [dataSorted, setDataSorted] = useState([]);
   const history = useHistory();
 
   const [modalEditVisible, setModalEditVisible] = useState(false);
   const [modalEditAction, setModalEditAction] = useState(null);
 
-  const sortData = (data) => {
-    return data.sort(function (a, b) {
-      if (a.term.toLowerCase() < b.term.toLowerCase()) {
-        return -1;
-      }
-      if (a.term.toLowerCase() > b.term.toLowerCase()) {
-        return 1;
-      }
-      return 0;
-    });
-  };
+  const editable =
+    (user && user.sets && user.sets.includes(selectedSet.id)) ||
+    (user && user.userRole && user.userRole === "admin");
 
-  useEffect(() => {
+  useEffect(async () => {
     const id = match.params.id;
-    dispatch(setSet(id)).then(() => dispatch(getAllFlashcards(id)));
+    dispatch(setSet(id)).catch(() => history.push("/"));
+    dispatch(getAllFlashcards(id)).then(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    if (
-      selectedSet &&
-      Object.keys(selectedSet).length === 0 &&
-      selectedSet.constructor === Object
-    ) {
-      history.push("/");
-    } else if (selectedSet) {
-      setLoading(false);
-    }
-  }, [selectedSet]);
-
   const prevFlashcardsRef = useRef();
-
   useEffect(() => {
-    if (allFlashcards && allFlashcards.length) {
-      const dataSorted = sortData(allFlashcards);
-      setDataFiltered(dataSorted);
-      const prevSets = prevFlashcardsRef.current;
-      if (prevSets !== allFlashcards) {
-        const dataSorted = sortData(allFlashcards);
-        setDataFiltered(dataSorted);
+    if (allFlashcards) {
+      const prevFlashcards = prevFlashcardsRef.current;
+      if (prevFlashcards !== allFlashcards) {
+        const dataSorted = sortFlashcardList(allFlashcards);
+        setDataSorted(dataSorted);
       }
       prevFlashcardsRef.current = allFlashcards;
     }
@@ -93,23 +73,19 @@ const FlashcardList = ({ match }) => {
   };
 
   const handleDelete = async (id) => {
-    return dispatch(deleteFlashcard(selectedSet.id, id)).then(() => {
-      dispatch(getUserSets());
-      dispatch(getPublicSets());
-    });
+    await dispatch(deleteFlashcard(selectedSet.id, id)).then(() =>
+      dispatch(getSets())
+    );
   };
 
   const onSearch = (e) => {
     const val = e.target.value;
-    setDataFiltered(
-      allFlashcards.filter((card) => {
-        if (
+    setDataSorted(
+      allFlashcards.filter(
+        (card) =>
           card.term.toLowerCase().includes(val.toLowerCase()) ||
           card.definition.toLowerCase().includes(val.toLowerCase())
-        ) {
-          return card;
-        }
-      })
+      )
     );
   };
 
@@ -134,7 +110,7 @@ const FlashcardList = ({ match }) => {
         Study
       </Button>,
     ];
-    if (user && user.sets && user.sets.includes(selectedSet.id)) {
+    if (editable) {
       action.splice(
         1,
         0,
@@ -147,15 +123,10 @@ const FlashcardList = ({ match }) => {
   };
 
   return (
-    <Layout className="content-layout">
-      <FlashcardListModal
-        visible={modalEditVisible}
-        setVisible={setModalEditVisible}
-        action={modalEditAction}
-      />
+    <>
       <PageHeader
         title={pageHeaderTitle()}
-        className="content-page-header"
+        className="content-header"
         extra={renderActions()}
       />
       <Content className="content">
@@ -164,15 +135,13 @@ const FlashcardList = ({ match }) => {
         ) : (
           <List
             itemLayout="horizontal"
-            dataSource={dataFiltered}
+            dataSource={dataSorted}
             className="list"
             locale={{ emptyText: "No flashcards." }}
             renderItem={(item) => (
               <List.Item
                 actions={
-                  user &&
-                  user.sets &&
-                  user.sets.includes(selectedSet.id) && [
+                  editable && [
                     <EditOutlined
                       onClick={() => onModalEditOpen("edit", item.id)}
                       key={item.id}
@@ -193,7 +162,12 @@ const FlashcardList = ({ match }) => {
           />
         )}
       </Content>
-    </Layout>
+      <FlashcardsModal
+        visible={modalEditVisible}
+        setVisible={setModalEditVisible}
+        action={modalEditAction}
+      />
+    </>
   );
 };
 
