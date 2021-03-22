@@ -1,6 +1,6 @@
 .card {
-  width: 28rem;
-  height: 14.6rem;
+  min-width: 28rem;
+  height: 14rem;
   display: flex;
   align-items: center;
   .card-ellipsis {
@@ -13,19 +13,11 @@
   .ant-card-body {
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
 }
 
 .card-modal-content {
-  text-overflow: ellipsis;
   :hover {
     cursor: pointer;
-  }
-}
-
-@media only screen and (max-width: 720px) {
-  .card {
-    width: calc(100vw - 5rem);
   }
 }

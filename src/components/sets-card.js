@@ -74,11 +74,10 @@ const SetsCard = ({ item, onCardModalOpen }) => {
       }}
     >
       <div className="card-content">
-        <Meta title={item.name} description={`Total Cards: ${item.count}`} />
+        <Meta title={item.name} description={`Total cards: ${item.count}`} />
       </div>
       {editable && (
         <div
-          className="menu-container"
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => e.stopPropagation()}
           role="button"
@@ -89,7 +88,6 @@ const SetsCard = ({ item, onCardModalOpen }) => {
             content={content(onCardModalOpen)}
             trigger="click"
             key={item.id}
-            className="card-popover"
             visible={popOverVisible}
           >
             <EllipsisOutlined

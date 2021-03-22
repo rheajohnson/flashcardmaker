@@ -56,7 +56,7 @@ const MainHeader = () => {
   };
 
   return (
-    <Header>
+    <Header className="main-header">
       <Link to="/">
         <img src={logo} alt="Flashcard Maker" className="header-logo" />
       </Link>

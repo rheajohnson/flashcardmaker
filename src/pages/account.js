@@ -21,19 +21,19 @@ const Account = () => {
   }
 
   return (
-    <>
-      <PageHeader
-        title={
-          <Breadcrumb>
-            <Breadcrumb.Item>Account</Breadcrumb.Item>
-          </Breadcrumb>
-        }
-        className="content-header"
-      />
-      <Content className="content">
-        {loading ? (
-          <Loading />
-        ) : (
+    <Content className="content">
+      {loading ? (
+        <Loading />
+      ) : (
+        <>
+          <PageHeader
+            title={
+              <Breadcrumb>
+                <Breadcrumb.Item>Account</Breadcrumb.Item>
+              </Breadcrumb>
+            }
+            className="content-header"
+          />
           <div className="account-form-container">
             <Form form={form} layout="vertical">
               <Form.Item label="Username">
@@ -47,9 +47,9 @@ const Account = () => {
               </Form.Item>
             </Form>
           </div>
-        )}
-      </Content>
-    </>
+        </>
+      )}
+    </Content>
   );
 };
 

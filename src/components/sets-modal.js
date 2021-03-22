@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Modal, Button, Form, Input, Switch, Typography } from "antd";
 import { updateSet, addSet } from "../redux/actions/sets";
+import { getUser } from "../redux/actions/auth";
 import { clearMessage } from "../redux/actions/message";
 
 const { Text } = Typography;
@@ -20,13 +21,13 @@ const SetsModal = ({ visible, setVisible, action }) => {
     const cardType = isPublic ? "public" : "private";
     setLoading(true);
     if (action === "edit") {
-      await dispatch(updateSet(name, cardType, selectedSet.id)).then(() =>
-        setVisible(false)
-      );
+      await dispatch(updateSet(name, cardType, selectedSet.id));
     }
     if (action === "add") {
-      await dispatch(addSet(name, cardType)).then(() => setVisible(false));
+      await dispatch(addSet(name, cardType));
+      await dispatch(getUser());
     }
+    setVisible(false);
     setLoading(false);
   };
 
@@ -93,7 +94,7 @@ const SetsModal = ({ visible, setVisible, action }) => {
             </Form.Item>
           )}
           {message && (
-            <div className="message-error">
+            <div className="message error">
               <Text type="danger"> {message}</Text>
             </div>
           )}

@@ -123,16 +123,21 @@ const FlashcardList = ({ match }) => {
   };
 
   return (
-    <>
-      <PageHeader
-        title={pageHeaderTitle()}
-        className="content-header"
-        extra={renderActions()}
+    <Content className="content">
+      <FlashcardsModal
+        visible={modalEditVisible}
+        setVisible={setModalEditVisible}
+        action={modalEditAction}
       />
-      <Content className="content">
-        {loading ? (
-          <Loading />
-        ) : (
+      {loading ? (
+        <Loading />
+      ) : (
+        <>
+          <PageHeader
+            title={pageHeaderTitle()}
+            className="content-header"
+            extra={renderActions()}
+          />
           <List
             itemLayout="horizontal"
             dataSource={dataSorted}
@@ -160,14 +165,9 @@ const FlashcardList = ({ match }) => {
               </List.Item>
             )}
           />
-        )}
-      </Content>
-      <FlashcardsModal
-        visible={modalEditVisible}
-        setVisible={setModalEditVisible}
-        action={modalEditAction}
-      />
-    </>
+        </>
+      )}
+    </Content>
   );
 };
 

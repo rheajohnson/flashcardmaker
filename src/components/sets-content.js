@@ -5,13 +5,16 @@ import SetsCard from "../components/sets-card";
 
 const { Content } = Layout;
 
-const SetsContent = ({ type, sets, editable, onModalEditOpen }) => {
+const SetsContent = ({ type, sets, onModalOpen }) => {
   const { user } = useSelector((state) => state.auth);
+
+  const editable =
+    type === "private" || (user && user.userRole && user.userRole === "admin");
 
   const getActions = () => {
     return editable
       ? [
-          <Button key="1" type="primary" onClick={() => onModalEditOpen("add")}>
+          <Button key="1" type="primary" onClick={() => onModalOpen("add")}>
             New set
           </Button>,
         ]
@@ -19,7 +22,7 @@ const SetsContent = ({ type, sets, editable, onModalEditOpen }) => {
   };
 
   return (
-    <>
+    <Content className="content">
       <PageHeader
         title={
           <Breadcrumb>
@@ -31,27 +34,25 @@ const SetsContent = ({ type, sets, editable, onModalEditOpen }) => {
         className="content-header"
         extra={getActions()}
       />
-      <Content className="content">
-        <div className="site-card-wrapper">
-          <List
-            grid={{
-              gutter: 16,
-            }}
-            locale={{ emptyText: "No flashcard sets" }}
-            dataSource={sets || []}
-            renderItem={(item) => (
-              <List.Item>
-                <SetsCard
-                  item={item}
-                  editable={editable || (user && user.userRole === "admin")}
-                  onCardModalOpen={() => onModalEditOpen("edit", item.id)}
-                />
-              </List.Item>
-            )}
-          />
-        </div>
-      </Content>
-    </>
+      <List
+        grid={{
+          gutter: 16,
+          xs: 1,
+          sm: 1,
+        }}
+        locale={{ emptyText: "No flashcard sets" }}
+        dataSource={sets || []}
+        renderItem={(item) => (
+          <List.Item>
+            <SetsCard
+              item={item}
+              editable={editable || (user && user.userRole === "admin")}
+              onCardModalOpen={() => onModalOpen("edit", item.id)}
+            />
+          </List.Item>
+        )}
+      />
+    </Content>
   );
 };
 

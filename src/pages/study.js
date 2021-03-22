@@ -212,12 +212,16 @@ const Sets = ({ match }) => {
   };
 
   return (
-    <>
-      <PageHeader title={renderPageHeaderTitle()} className="content-header" />
-      <Content className="content">
-        {loading ? (
-          <Loading />
-        ) : (
+    <Content className="content">
+      {loading ? (
+        <Loading />
+      ) : (
+        <>
+          <PageHeader
+            title={renderPageHeaderTitle()}
+            className="content-header"
+          />
+
           <Layout className="study-layout">
             <Header className="study-header">
               <div className="study-progress">
@@ -228,16 +232,14 @@ const Sets = ({ match }) => {
                 />
                 <Text>{`${progressIndex + 1}/${allFlashcards.length}`}</Text>
               </div>
-              <div className="study-header-action">
-                {!finished && (
-                  <Button
-                    type="secondary"
-                    onClick={() => shuffleFlashcards(allFlashcards)}
-                  >
-                    Shuffle
-                  </Button>
-                )}
-              </div>
+              {!finished && (
+                <Button
+                  type="secondary"
+                  onClick={() => shuffleFlashcards(allFlashcards)}
+                >
+                  Shuffle
+                </Button>
+              )}
             </Header>
             {!cardTransitioning && (
               <Content
@@ -287,9 +289,9 @@ const Sets = ({ match }) => {
               </Footer>
             )}
           </Layout>
-        )}
-      </Content>
-    </>
+        </>
+      )}
+    </Content>
   );
 };
 

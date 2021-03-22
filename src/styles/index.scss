@@ -1,7 +1,6 @@
 @import "account.scss";
 @import "card.scss";
 @import "flashcards.scss";
-@import "footer.scss";
 @import "header.scss";
 @import "loading.scss";
 @import "login.scss";
@@ -25,15 +24,11 @@ body {
 layout
 */
 .content-header {
-  padding: 1.6rem 4rem;
-  button {
-    min-width: 9.6rem;
-  }
+  padding: 1.6rem 0rem;
 }
 
 .content {
-  padding: 0 4rem 1.6rem;
-  width: 100%;
+  padding: 0 4rem;
   overflow: hidden;
 }
 
@@ -45,8 +40,5 @@ layout
   .content {
     padding: 0 2rem 1.6rem;
     overflow: hidden;
-    &-page-header {
-      padding: 1.6rem 2rem;
-    }
   }
 }

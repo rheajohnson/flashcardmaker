@@ -23,11 +23,13 @@ const Sets = () => {
     }
   }, [user]);
 
-  const onModalEditOpen = (action, id) => {
-    dispatch(setSet(id)).then(() => {
-      setModalEditAction(action);
-      setModalEditVisible(true);
-    });
+  const onModalOpen = (action, id) => {
+    setModalEditAction(action);
+    if (id)
+      dispatch(setSet(id)).then(() => {
+        setModalEditVisible(true);
+      });
+    else setModalEditVisible(true);
   };
 
   const prevUserSetsRef = useRef();
@@ -62,7 +64,7 @@ const Sets = () => {
         <SetsContent
           type="private"
           sets={userSetsFiltered}
-          onModalEditOpen={onModalEditOpen}
+          onModalOpen={onModalOpen}
         />
       )}
       <SetsContent type="public" sets={publicSetsFiltered} />
