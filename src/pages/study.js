@@ -176,17 +176,17 @@ const Sets = ({ match }) => {
   const renderTerm = () => {
     if (!finished)
       return (
-        <div className="flip-card-term flip-card-term-active">
+        <div className="study-card-term study-card-term-active">
           <Title level={4}>{`${currentFlashcard.term}`}</Title>
-          <div className="study-content-banner">Click the card to flip!</div>
+          <div className="study-card-banner">Click the card to flip!</div>
         </div>
       );
     return (
-      <div className="flip-card-term flip-card-finished">
+      <div className="study-card-term study-card-finished">
         <Title level={4}>{`Great job! You just finished studying ${
           allFlashcards.length
         } card${allFlashcards.length > 1 ? "s" : ""}!`}</Title>
-        <div className="flip-card-finished-action">
+        <div className="study-card-finished-action">
           <Button
             key="1"
             type="secondary"
@@ -204,93 +204,88 @@ const Sets = ({ match }) => {
 
   const renderDefinition = () => {
     return (
-      <div className="flip-card-definition">
+      <div className="study-card-definition">
         <Title level={4}>{`${currentFlashcard.definition}`}</Title>
-        <div className="study-content-banner">Click the card to flip!</div>
+        <div className="study-card-banner">Click the card to flip!</div>
       </div>
     );
   };
 
-  return (
+  return loading || !allFlashcards ? (
+    <Loading />
+  ) : (
     <Content className="content">
-      {loading ? (
-        <Loading />
-      ) : (
-        <>
-          <PageHeader
-            title={renderPageHeaderTitle()}
-            className="content-header"
-          />
-
-          <Layout className="study-layout">
-            <Header className="study-header">
-              <div className="study-progress">
-                <Text>Progress</Text>
-                <Progress
-                  percent={100 * ((progressIndex + 1) / allFlashcards.length)}
-                  showInfo={false}
-                />
-                <Text>{`${progressIndex + 1}/${allFlashcards.length}`}</Text>
-              </div>
-              {!finished && (
-                <Button
-                  type="secondary"
-                  onClick={() => shuffleFlashcards(allFlashcards)}
-                >
-                  Shuffle
-                </Button>
-              )}
-            </Header>
-            {!cardTransitioning && (
-              <Content
-                className={`study-content ${
-                  cardFlipped &&
-                  !cardTransitioning &&
-                  !finished &&
-                  "study-content-animated"
-                }`}
-              >
-                <div
-                  className="flip-card-inner"
-                  onClick={() => flipCard()}
-                  onKeyDown={(e) => handleKeyPress(e)}
-                  onBlur={() => focusCard()}
-                  ref={cardRef}
-                  tabIndex={0}
-                  role="button"
-                >
-                  {renderTerm()}
-                  {renderDefinition()}
-                </div>
-              </Content>
-            )}
-            {!finished && (
-              <Footer
-                className="study-footer"
-                onClick={(e) => e.stopPropagation()}
-                role="button"
-                onKeyDown={(e) => e.stopPropagation()}
-                tabIndex={0}
-              >
-                <Button
-                  key="1"
-                  type="secondary"
-                  icon={<LeftOutlined />}
-                  onClick={() => navigateCards("prev")}
-                  disabled={!progressIndex}
-                />
-                <Button
-                  key="2"
-                  type="secondary"
-                  icon={<RightOutlined />}
-                  onClick={() => navigateCards("next")}
-                  disabled={progressIndex === allFlashcards.length}
-                />
-              </Footer>
-            )}
-          </Layout>
-        </>
-      )}
+      <Layout className="study-layout">
+        <PageHeader
+          title={renderPageHeaderTitle()}
+          className="content-header"
+        />
+        <Header className="study-card-header">
+          <div className="study-card-progress">
+            <Text>Progress</Text>
+            <Progress
+              percent={100 * ((progressIndex + 1) / allFlashcards.length)}
+              showInfo={false}
+            />
+            <Text>{`${progressIndex + 1}/${allFlashcards.length}`}</Text>
+          </div>
+          {!finished && (
+            <Button
+              type="secondary"
+              onClick={() => shuffleFlashcards(allFlashcards)}
+            >
+              Shuffle
+            </Button>
+          )}
+        </Header>
+        {!cardTransitioning && (
+          <div
+            className={`study-card ${
+              cardFlipped &&
+              !cardTransitioning &&
+              !finished &&
+              "study-card-animated"
+            }`}
+          >
+            <div
+              className="study-card-inner"
+              onClick={() => flipCard()}
+              onKeyDown={(e) => handleKeyPress(e)}
+              onBlur={() => focusCard()}
+              ref={cardRef}
+              tabIndex={0}
+              role="button"
+            >
+              {renderTerm()}
+              {renderDefinition()}
+            </div>
+          </div>
+        )}
+        {!finished && (
+          <Footer
+            className="study-card-action"
+            onClick={(e) => e.stopPropagation()}
+            role="button"
+            onKeyDown={(e) => e.stopPropagation()}
+            tabIndex={0}
+          >
+            <Button
+              key="1"
+              type="secondary"
+              icon={<LeftOutlined />}
+              onClick={() => navigateCards("prev")}
+              disabled={!progressIndex}
+            />
+            <Button
+              key="2"
+              type="secondary"
+              icon={<RightOutlined />}
+              onClick={() => navigateCards("next")}
+              disabled={progressIndex === allFlashcards.length}
+            />
+          </Footer>
+        )}
+      </Layout>
     </Content>
   );
 };

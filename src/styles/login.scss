@@ -1,10 +1,13 @@
 @import "variables.scss";
 
 .login-content {
+  position: absolute;
+  top: 64px;
+  width: 100%;
+  height: calc(100% - 64px);
   display: flex;
   align-items: center;
   justify-content: center;
-  height: calc(100vh - 6.4rem);
 }
 
 .login-form-container {

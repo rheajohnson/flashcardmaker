@@ -57,6 +57,15 @@ const FlashcardListModal = ({ visible, setVisible, action }) => {
     }
   }, [visible]);
 
+  const cleanValue = (e) => {
+    const { value } = e.target;
+    const valueTrimed =
+      value.trim().length > 0 ? e.target.value.replace(/  +/g, " ") : "";
+    form.setFieldsValue({
+      [e.target.id]: valueTrimed,
+    });
+  };
+
   return (
     <>
       <Modal
@@ -95,7 +104,7 @@ const FlashcardListModal = ({ visible, setVisible, action }) => {
               },
             ]}
           >
-            <Input minLength={5} />
+            <Input onChange={(e) => cleanValue(e)} />
           </Form.Item>
           <Form.Item
             label="Back"
@@ -113,7 +122,7 @@ const FlashcardListModal = ({ visible, setVisible, action }) => {
               },
             ]}
           >
-            <Input minLength={5} />
+            <Input onChange={(e) => cleanValue(e)} />
           </Form.Item>
         </Form>
       </Modal>

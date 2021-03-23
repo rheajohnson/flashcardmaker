@@ -4,6 +4,7 @@
   display: flex;
   align-items: center;
   position: sticky;
+  top: 0;
   z-index: 1;
   width: 100%;
   .header-logo {
@@ -80,6 +81,7 @@ mobile nav
   padding: 0;
   li {
     list-style: none;
+    width: 100%;
     &:hover {
       cursor: pointer;
     }

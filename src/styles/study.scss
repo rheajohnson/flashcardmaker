@@ -1,18 +1,20 @@
 @import "variables.scss";
 
 .study-layout {
-  width: 100%;
-  height: calc(100vh - 20rem);
+  position: relative;
+  top: 0;
+  left: 0;
+  height: calc(100vh - 128px);
 }
 
-.study-header {
+.study-card-header {
   background-color: white;
-  padding: 0 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 2px solid $off-white;
-  .study-progress {
+  padding: 0 2rem;
+  .study-card-progress {
     width: 100%;
     display: flex;
     align-items: center;
@@ -25,16 +27,18 @@
   }
 }
 
-.study-content {
+.study-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
   perspective: 1000px;
-  background-color: transparent;
-  .study-content-banner {
-    background-color: #001529;
+  height: 100%;
+  min-height: 32rem;
+  cursor: pointer;
+  .study-card-banner {
+    background-color: $off-black;
     height: 4rem;
     width: 100%;
     bottom: 0.05rem;
@@ -46,17 +50,16 @@
   }
 }
 
-.study-footer {
+.study-card-action {
   width: 32rem;
   align-self: center;
   display: flex;
   justify-content: space-between;
-  &:hover {
-    cursor: default;
-  }
+  margin: auto;
+  background-color: transparent;
 }
 
-.flip-card-inner {
+.study-card-inner {
   position: relative;
   width: 100%;
   height: 100%;
@@ -65,42 +68,37 @@
   transform-style: preserve-3d;
 }
 
-.study-content-animated .flip-card-inner {
+.study-card-animated .study-card-inner {
   transform: rotateX(180deg);
 }
 
-.flip-card-term,
-.flip-card-definition {
+.study-card-term,
+.study-card-definition {
   position: absolute;
-  padding: 2.4rem;
+  padding: 4rem;
   width: 100%;
   height: 100%;
+  background-color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  -webkit-backface-visibility: hidden; /* Safari */
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+  h4 {
+    font-size: 2.4rem !important;
+  }
 }
 
-.flip-card-term-active,
-.flip-card-definition {
-  cursor: pointer;
-}
-
-.flip-card-term {
-  background-color: #fff;
-}
-
-.flip-card-definition {
-  background-color: #fff;
+.study-card-definition {
   transform: rotateX(180deg);
 }
 
-.flip-card-finished {
+.study-card-finished {
   display: flex;
   flex-direction: column;
   padding: 4rem;
-  .flip-card-finished-action {
+  cursor: default;
+  .study-card-finished-action {
     margin: 2.4rem;
     button {
       margin: 1.2rem;

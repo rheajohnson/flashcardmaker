@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Modal, Button, Form, Input, Switch, Typography } from "antd";
+import { Modal, Button, Form, Input, Switch } from "antd";
 import { updateSet, addSet } from "../redux/actions/sets";
 import { getUser } from "../redux/actions/auth";
-import { clearMessage } from "../redux/actions/message";
-
-const { Text } = Typography;
 
 const SetsModal = ({ visible, setVisible, action }) => {
   const [loading, setLoading] = useState(false);
@@ -13,7 +10,6 @@ const SetsModal = ({ visible, setVisible, action }) => {
   const [form] = Form.useForm();
 
   const { selectedSet } = useSelector((state) => state.sets);
-  const { message } = useSelector((state) => state.message);
 
   const dispatch = useDispatch();
 
@@ -33,7 +29,6 @@ const SetsModal = ({ visible, setVisible, action }) => {
 
   const handleCancel = () => {
     setVisible(false);
-    dispatch(clearMessage());
   };
 
   useEffect(() => {
@@ -47,6 +42,15 @@ const SetsModal = ({ visible, setVisible, action }) => {
       });
     }
   }, [visible]);
+
+  const cleanValue = (e) => {
+    const { value } = e.target;
+    const valueTrimed =
+      value.trim().length > 0 ? e.target.value.replace(/  +/g, " ") : "";
+    form.setFieldsValue({
+      [e.target.id]: valueTrimed,
+    });
+  };
 
   return (
     <>
@@ -86,17 +90,12 @@ const SetsModal = ({ visible, setVisible, action }) => {
               },
             ]}
           >
-            <Input minLength={5} />
+            <Input onChange={(e) => cleanValue(e)} />
           </Form.Item>
           {user && user.userRole === "admin" && (
             <Form.Item label="Public" name="isPublic" valuePropName="checked">
               <Switch />
             </Form.Item>
-          )}
-          {message && (
-            <div className="message error">
-              <Text type="danger"> {message}</Text>
-            </div>
           )}
         </Form>
       </Modal>

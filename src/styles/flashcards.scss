@@ -1,4 +1,15 @@
-.list {
+.flashcards-list {
   padding: 0px 1.6rem;
   background-color: white;
+}
+
+@media only screen and (max-width: 720px) {
+  .ant-page-header-heading-extra {
+    input {
+      display: none;
+    }
+    button:first-of-type {
+      margin-left: 0;
+    }
+  }
 }

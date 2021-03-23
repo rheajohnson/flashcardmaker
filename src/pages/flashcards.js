@@ -122,51 +122,44 @@ const FlashcardList = ({ match }) => {
     return action;
   };
 
-  return (
+  return loading ? (
+    <Loading />
+  ) : (
     <Content className="content">
       <FlashcardsModal
         visible={modalEditVisible}
         setVisible={setModalEditVisible}
         action={modalEditAction}
       />
-      {loading ? (
-        <Loading />
-      ) : (
-        <>
-          <PageHeader
-            title={pageHeaderTitle()}
-            className="content-header"
-            extra={renderActions()}
-          />
-          <List
-            itemLayout="horizontal"
-            dataSource={dataSorted}
-            className="list"
-            locale={{ emptyText: "No flashcards." }}
-            renderItem={(item) => (
-              <List.Item
-                actions={
-                  editable && [
-                    <EditOutlined
-                      onClick={() => onModalEditOpen("edit", item.id)}
-                      key={item.id}
-                    />,
-                    <DeleteOutlined
-                      onClick={() => DeleteConfirm(item.id, handleDelete)}
-                      key={item.id}
-                    />,
-                  ]
-                }
-              >
-                <List.Item.Meta
-                  title={item.term}
-                  description={item.definition}
-                />
-              </List.Item>
-            )}
-          />
-        </>
-      )}
+      <PageHeader
+        title={pageHeaderTitle()}
+        className="content-header"
+        extra={renderActions()}
+      />
+      <List
+        itemLayout="horizontal"
+        dataSource={dataSorted}
+        className="flashcards-list"
+        locale={{ emptyText: "No flashcards." }}
+        renderItem={(item) => (
+          <List.Item
+            actions={
+              editable && [
+                <EditOutlined
+                  onClick={() => onModalEditOpen("edit", item.id)}
+                  key={item.id}
+                />,
+                <DeleteOutlined
+                  onClick={() => DeleteConfirm(item.id, handleDelete)}
+                  key={item.id}
+                />,
+              ]
+            }
+          >
+            <List.Item.Meta title={item.term} description={item.definition} />
+          </List.Item>
+        )}
+      />
     </Content>
   );
 };
