@@ -6,7 +6,7 @@ import { Popover } from "antd";
 import DeleteConfirm from "./delete-confirm";
 import { useHistory } from "react-router-dom";
 
-import { deleteSet, setSet } from "../redux/actions/sets";
+import { deleteSet } from "../redux/actions/sets";
 
 const { Meta } = Card;
 
@@ -25,7 +25,7 @@ const SetsCard = ({ item, onCardModalOpen }) => {
   };
 
   const handleSelect = (id) => {
-    dispatch(setSet(id)).then(() => history.push(`/${id}`));
+    history.push(`/${id}`);
   };
 
   const content = (onCardModalOpen) => (
